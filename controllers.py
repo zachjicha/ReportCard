@@ -28,10 +28,23 @@ Warning: Fixtures MUST be declared with @action.uses({fixtures}) else your app w
 from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
+from py4web.utils.url_signer import URLSigner
+from .models import get_user_email
 
+url_signer = URLSigner(session)
 
-@unauthenticated("index", "index.html")
+@action('index')
+@action.uses(db, auth, 'index.html')
 def index():
-    user = auth.get_user()
-    message = T("Hello {first_name}".format(**user) if user else "Hello")
-    return dict(message=message)
+    ## TODO: Show to each logged in user the birds they have seen with their count.
+    # The table must have an edit button to edit a row, and also, a +1 button to increase the count
+    # by 1 (this needs to be protected by a signed URL).
+    # On top of the table there is a button to insert a new bird.
+    return dict()
+
+@action('profile/<user_id:int>')
+@action.uses(db, session, 'profile.html')
+def profile(user_id=None):
+    assert user_id is not None
+
+    return dict(user=db(db.auth_user.id == user_id).select().first())
