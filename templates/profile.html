@@ -1,17 +1,30 @@
 [[extend 'layout.html']]
 
+
+
+
 <div class="section">
-   <!-- Put the table here -->
-    <div class="columns">
-        <div class="column is-one-fifth">
-            <p>asdsadsadsaddddddddddddddddddddddddddddddddddddddddd</p>
-        </div>
+  <div class="columns is-mobile">
+      <div class="column is-3 has-text-centered">
+          <figure style="margin-left: auto; margin-right: auto" class="image">
+              <img class="is-rounded" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBDh-IKAEasnr4GIcMkMz0iNZa6DZtNe1gGw&usqp=CAU">
+          </figure>
 
-        <div class="column">
-            <p>dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</p>
-        </div>
+          <h1 class="title">[[=user.first_name]] [[=user.last_name]]</h1>
+          <h2 class="subtitle">[[=user.email]]</h2>
 
-    </div>
+          [[if user.email == email:]]
 
+          <button class="button">
+              Edit Profile
+          </button>
+
+          [[pass]]
+
+      </div>
+      <div class="column">
+          goodbye
+      </div>
+  </div>
 
 </div>

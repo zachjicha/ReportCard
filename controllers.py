@@ -47,4 +47,4 @@ def index():
 def profile(user_id=None):
     assert user_id is not None
 
-    return dict(user=db(db.auth_user.id == user_id).select().first())
+    return dict(user=db(db.auth_user.id == user_id).select().first(), email=get_user_email())
