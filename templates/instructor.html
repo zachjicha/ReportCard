@@ -1,0 +1,34 @@
+[[extend 'layout.html']]
+
+<div class="section">
+
+    <h1 class="title">[[=instr.first_name]] [[=instr.last_name]]</h1>
+    <h2 class="subtitle">An instructor in the <b>[[=instr.department]]</b> department at <b>[[=school]]</b><br>[[=rating]]</h2>
+
+    <button class="button">
+        <span>Rate this instructor</span>
+    </button>
+
+</div>
+
+<div class="section">
+    <h1 class="title">Reviews</h1>
+
+    <hr>
+
+    [[for review in reviews:]]
+    <div class="box">
+        <span><b>Course: </b> [[=review["course_name"] ]]</span><br>
+        <span><b>Rating: </b> [[=review["rating"] ]]/5.0</span><br>
+        <span>[[=review["review"] ]]</span><br>
+        <span>
+            <button class="button">
+                <span class="icon"><i class="fa fa-thumbs-o-up"></i></span>
+            </button>
+            <button class="button">
+                <span class="icon"><i class="fa fa-thumbs-o-down"></i></span>
+            </button>
+        </span>
+    </div>
+    [[pass]]
+</div>

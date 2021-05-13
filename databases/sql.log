@@ -35,3 +35,57 @@ CREATE TABLE "bird"(
     "seen_by" CHAR(512)
 );
 success!
+timestamp: 2021-05-12T16:28:01.125850
+CREATE TABLE "schools"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512)
+);
+success!
+timestamp: 2021-05-12T16:28:01.139580
+CREATE TABLE "courses"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512),
+    "school" INTEGER REFERENCES "schools" ("id") ON DELETE CASCADE  ,
+    "description" TEXT
+);
+success!
+timestamp: 2021-05-12T16:28:01.144781
+CREATE TABLE "instructors"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "first_name" CHAR(512),
+    "last_name" CHAR(512),
+    "school" INTEGER REFERENCES "schools" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2021-05-12T16:28:01.150128
+CREATE TABLE "course_reviews"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "course" INTEGER REFERENCES "courses" ("id") ON DELETE CASCADE  ,
+    "review" TEXT
+);
+success!
+timestamp: 2021-05-12T16:28:52.563067
+CREATE TABLE "instructor_reviews"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "course" INTEGER REFERENCES "instructors" ("id") ON DELETE CASCADE  ,
+    "review" TEXT
+);
+success!
+timestamp: 2021-05-12T16:43:34.987107
+ALTER TABLE "course_reviews" ADD "rating" DOUBLE;
+success!
+timestamp: 2021-05-12T16:43:34.992444
+ALTER TABLE "instructor_reviews" ADD "rating" DOUBLE;
+success!
+timestamp: 2021-05-12T17:02:35.934144
+CREATE TABLE "reviews"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "course" INTEGER REFERENCES "courses" ("id") ON DELETE CASCADE  ,
+    "instructor" INTEGER REFERENCES "instructors" ("id") ON DELETE CASCADE  ,
+    "review" TEXT,
+    "rating" DOUBLE
+);
+success!
+timestamp: 2021-05-12T17:33:42.413711
+ALTER TABLE "instructors" ADD "department" TEXT;
+success!

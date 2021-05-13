@@ -28,7 +28,7 @@ db.define_table(
 db.define_table(
     'courses',
     Field('name', requires=IS_NOT_EMPTY()),
-    Field('school', 'reference schools'),
+    Field('school', 'reference schools', requires=IS_NOT_EMPTY()),
     Field('description', 'text'),
 )
 
@@ -36,25 +36,21 @@ db.define_table(
     'instructors',
     Field('first_name', requires=IS_NOT_EMPTY()),
     Field('last_name', requires=IS_NOT_EMPTY()),
-    Field('school', 'reference schools'),
+    Field('school', 'reference schools', requires=IS_NOT_EMPTY()),
+    Field('department', 'text', requires=IS_NOT_EMPTY()),
 )
 
 db.define_table(
-    'course_reviews',
-    Field('course', 'reference courses'),
-    Field('review', 'text'),
+    'reviews',
+    Field('course', 'reference courses', requires=IS_NOT_EMPTY()),
+    Field('instructor', 'reference instructors', requires=IS_NOT_EMPTY()),
+    Field('review', 'text', requires=IS_NOT_EMPTY()),
+    Field('rating', 'double', requires=IS_FLOAT_IN_RANGE(0, 5)),
 )
 
-db.define_table(
-    'instructor_reviews',
-    Field('course', 'reference instructor'),
-    Field('review', 'text'),
-)
-
-db.schools.id.readable            = db.schools.id.writable            = False
-db.courses.id.readable            = db.courses.id.writable            = False
-db.instructors.id.readable        = db.instructors.id.writable        = False
-db.course_reviews.id.readable     = db.course_reviews.id.writable     = False
-db.instructor_reviews.id.readable = db.instructor_reviews.id.writable = False
+db.schools.id.readable     = db.schools.id.writable     = False
+db.courses.id.readable     = db.courses.id.writable     = False
+db.instructors.id.readable = db.instructors.id.writable = False
+db.reviews.id.readable     = db.reviews.id.writable     = False
 
 db.commit()
