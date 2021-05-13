@@ -1,0 +1,28 @@
+[[extend 'layout.html']]
+
+<div class="section">
+  <div class="columns is-mobile">
+      <div class="column is-2 has-text-centered">
+          <figure style="margin-left: auto; margin-right: auto" class="image is-1by1">
+              <img class="is-rounded" src="https://www.kron4.com/wp-content/uploads/sites/11/2018/10/SEAFOOD_1540066353667_59638469_ver1.0.jpg">
+          </figure>
+
+          <h1 class="title">[[=user.first_name]] [[=user.last_name]]</h1>
+          <h2 class="subtitle">[[=user.email]]</h2>
+
+          [[if user.email == email:]]
+
+          <button class="button">
+              Button
+          </button>
+
+          [[pass]]
+
+      </div>
+
+      <div class="column">
+          goodbye
+      </div>
+  </div>
+
+</div>
