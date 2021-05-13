@@ -1,13 +1,10 @@
 [[extend 'layout.html']]
 
-
-
-
 <div class="section">
   <div class="columns is-mobile">
-      <div class="column is-3 has-text-centered">
-          <figure style="margin-left: auto; margin-right: auto" class="image">
-              <img class="is-rounded" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBDh-IKAEasnr4GIcMkMz0iNZa6DZtNe1gGw&usqp=CAU">
+      <div class="column is-2 has-text-centered">
+          <figure style="margin-left: auto; margin-right: auto" class="image is-1by1">
+              <img class="is-rounded" src="https://www.kron4.com/wp-content/uploads/sites/11/2018/10/SEAFOOD_1540066353667_59638469_ver1.0.jpg">
           </figure>
 
           <h1 class="title">[[=user.first_name]] [[=user.last_name]]</h1>
@@ -16,12 +13,13 @@
           [[if user.email == email:]]
 
           <button class="button">
-              Edit Profile
+              Button
           </button>
 
           [[pass]]
 
       </div>
+
       <div class="column">
           goodbye
       </div>
