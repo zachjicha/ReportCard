@@ -69,7 +69,7 @@ def course(course_id=None):
     return dict(course=course_info, reviews=reviews, rating=rating_string)
 
 @action('instructor/<instr_id:int>')
-@action.uses(db, session, auth.user, 'instructor.html')
+@action.uses(db, session, auth, 'instructor.html')
 def course(instr_id=None):
     assert instr_id is not None
 
@@ -78,6 +78,8 @@ def course(instr_id=None):
 
     assert instr_info is not None
     assert reviews is not None
+
+    logged_in = True if get_user_email() is not None else False
 
     ratings = []
     school = db(db.schools.id == instr_info.school).select().first().name
@@ -89,16 +91,17 @@ def course(instr_id=None):
 
     if ratings:
         avg_rating = sum(ratings)/len(ratings)
-        rating_string = "{:.2f}/5.0".format(avg_rating)
+        rating_string = "{:.1f}/5.0".format(avg_rating)
     else:
         rating_string = "No ratings yet..."
 
     return dict(instr=instr_info,
                 reviews=reviews,
-                rating=rating_string,
+                rating_string=rating_string,
                 school=school,
                 author=get_user_email(),
                 instr_id=instr_id,
+                logged_in=logged_in,
                 load_instructor_reviews_url=URL('load_instructor_reviews', signer=url_signer),
                 add_review_url=URL('add_review', signer=url_signer),
                 delete_review_url=URL('delete_review', signer=url_signer),

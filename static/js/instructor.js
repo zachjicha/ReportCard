@@ -16,6 +16,8 @@ let init = (app) => {
         new_course: "",
         new_body: "",
         author: author,
+        logged_in: logged_in,
+        rating_string: rating_string,
     };
 
     app.enumerate = (a) => {
@@ -24,6 +26,16 @@ let init = (app) => {
         a.map((e) => {e._idx = k++;});
         return a;
     };
+
+    app.calculate_rating = function () {
+        let ratings = 0.0;
+        for(let i = 0; i < app.vue.reviews.length; i++) {
+            ratings += app.vue.reviews[i].rating;
+        }
+
+        let avg_rating = ratings / app.vue.reviews.length;
+        app.vue.rating_string = avg_rating.toFixed(1).toString() + "/5.0";
+    }
 
     app.set_add_mode = function (new_mode) {
         app.vue.add_mode = new_mode;
@@ -45,7 +57,6 @@ let init = (app) => {
             }
         ).then(function (response) {
             app.vue.reviews.push({
-                _idx: app.vue.reviews.length,
                 id: response.data.id,
                 body: body,
                 course: app.vue.new_course,
@@ -57,12 +68,14 @@ let init = (app) => {
                 likers: 0,
                 dislikers: 0,
                 hover: false,
-            })
+            });
+            app.enumerate(app.vue.reviews);
+            app.calculate_rating();
+            app.reset_form();
+            app.set_add_mode(false);
         });
 
-        app.enumerate(app.vue.reviews);
-        app.reset_form();
-        app.set_add_mode(false);
+
     };
 
     app.cancel_review = function () {
