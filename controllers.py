@@ -69,12 +69,16 @@ def course(course_id=None):
     return dict(course=course_info, reviews=reviews, rating=rating_string)
 
 @action('instructor/<instr_id:int>')
-@action.uses(db, session, 'instructor.html')
+@action.uses(db, session, auth.user, 'instructor.html')
 def course(instr_id=None):
     assert instr_id is not None
 
     instr_info = db(db.instructors.id == instr_id).select().first()
     reviews = db(db.reviews.instructor == instr_id).select().as_list()
+
+    assert instr_info is not None
+    assert reviews is not None
+
     ratings = []
     school = db(db.schools.id == instr_info.school).select().first().name
 
@@ -85,9 +89,108 @@ def course(instr_id=None):
 
     if ratings:
         avg_rating = sum(ratings)/len(ratings)
-        rating_string = str(avg_rating) + "/5.0"
+        rating_string = "{:.2f}/5.0".format(avg_rating)
     else:
         rating_string = "No ratings yet..."
 
-    return dict(instr=instr_info, reviews=reviews, rating=rating_string, school=school)
+    return dict(instr=instr_info,
+                reviews=reviews,
+                rating=rating_string,
+                school=school,
+                author=get_user_email(),
+                instr_id=instr_id,
+                load_instructor_reviews_url=URL('load_instructor_reviews', signer=url_signer),
+                add_review_url=URL('add_review', signer=url_signer),
+                delete_review_url=URL('delete_review', signer=url_signer),
+                add_like_url=URL('add_like', signer=url_signer),
+                flip_like_url=URL('flip_like', signer=url_signer),
+                delete_like_url=URL('delete_like', signer=url_signer),
+    )
 
+###########################################
+#            API ENDPOINTS                #
+###########################################
+@action('load_instructor_reviews', method="POST")
+@action.uses(url_signer.verify(), db)
+def load_instructor_reviews():
+    instr_id = request.json.get('instr_id')
+    assert instr_id is not None
+    reviews = db(db.reviews.instructor == instr_id).select().as_list()
+    likes = db(db.likes.user_email == get_user_email()).select().as_list()
+    assert reviews is not None
+    assert likes is not None
+
+    # Add all people who liked each post to each post and other info
+    for review in reviews:
+        course_description = db(db.courses.id == review["course"]).select().first()
+        assert course_description is not None
+        review["course_name"] = course_description.name
+
+        review_likes = db(db.likes.review == review["id"]).select()
+        review["likers"] = 0
+        review["dislikers"] = 0
+        for like in review_likes:
+            if like["is_like"]:
+                review["likers"] += 1
+            else:
+                review["dislikers"] += 1
+
+    return dict(reviews=reviews, likes=likes)
+
+@action('add_review', method="POST")
+@action.uses(url_signer.verify(), db)
+def add_review():
+    course = request.json.get('course')
+    instructor = request.json.get('instructor')
+    body = request.json.get('body')
+    rating = request.json.get('rating')
+    user = get_user_email()
+
+    if get_user_email() is None:
+        return dict(fail=True)
+
+    assert course is not None
+    assert instructor is not None
+    assert body is not None
+    assert rating is not None
+
+    new_id = db.reviews.insert(
+        course=course,
+        instructor=instructor,
+        body=body,
+        rating=rating,
+        user=get_user_email()
+    )
+
+    course_description = db(db.courses.id == course).select().first()
+    assert course_description is not None
+
+    return dict(id=new_id, fail=False, course_name=course_description.name)
+
+@action('add_like', method="POST")
+@action.uses(url_signer.verify(), db)
+def add_like():
+    new_id = db.likes.insert(
+        is_like=request.json.get('is_like'),
+        review=request.json.get('review'),
+        user_email=get_user_email(),
+    )
+    return dict(id=new_id)
+
+@action('flip_like', method="POST")
+@action.uses(url_signer.verify(), db)
+def flip_like():
+    like_id = request.json.get('id')
+    assert like_id is not None
+    new_val = request.json.get('is_like')
+    assert new_val is not None
+    db(db.likes.id == like_id).update(is_like=new_val)
+    return "ok"
+
+@action('delete_like', method="POST")
+@action.uses(url_signer.verify(), db)
+def delete_like():
+    like_id = request.json.get('id')
+    assert like_id is not None
+    db(db.likes.id == like_id).delete()
+    return "ok"

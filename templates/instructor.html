@@ -1,34 +1,100 @@
 [[extend 'layout.html']]
 
-<div class="section">
+<style>
+[v-cloak] {
+     display: none;
+}
+</style>
 
-    <h1 class="title">[[=instr.first_name]] [[=instr.last_name]]</h1>
-    <h2 class="subtitle">An instructor in the <b>[[=instr.department]]</b> department at <b>[[=school]]</b><br>[[=rating]]</h2>
+<div class="container" id="instr-page" v-cloak>
+    <div class="section">
 
-    <button class="button">
-        <span>Rate this instructor</span>
-    </button>
+        <h1 class="title">[[=instr.first_name]] [[=instr.last_name]]</h1>
+        <h2 class="subtitle">An instructor in the <b>[[=instr.department]]</b> department at <b>[[=school]]</b><br>[[=rating]]</h2>
 
-</div>
-
-<div class="section">
-    <h1 class="title">Reviews</h1>
-
-    <hr>
-
-    [[for review in reviews:]]
-    <div class="box">
-        <span><b>Course: </b> [[=review["course_name"] ]]</span><br>
-        <span><b>Rating: </b> [[=review["rating"] ]]/5.0</span><br>
-        <span>[[=review["review"] ]]</span><br>
-        <span>
-            <button class="button">
-                <span class="icon"><i class="fa fa-thumbs-o-up"></i></span>
+        <div v-if="!add_mode">
+            <button class="button" @click="set_add_mode(true)">
+                <span>Rate this instructor</span>
             </button>
-            <button class="button">
-                <span class="icon"><i class="fa fa-thumbs-o-down"></i></span>
-            </button>
-        </span>
+        </div>
+        <div v-else>
+            <div class="form">
+                <div class="field">
+                    <label class="label">Course Name</label>
+                    <div class="control">
+                        <input class="input" type="text" v-model="new_course">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Rating</label>
+                    <div class="control">
+                        <input class="input" type="text" v-model="new_rating">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Review</label>
+                    <div class="control">
+                        <textarea class="textarea" type="text" v-model="new_body"></textarea>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-success" @click="add_review">Post Review</button>
+                        <button class="button is-danger" @click="cancel_review">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    [[pass]]
+    <div class="section" id="instr-page">
+        <h1 class="title">Reviews</h1>
+
+        <hr>
+
+        <div class="box" v-for="r in reviews">
+            <div class="block">
+                <span><b>Course: </b> {{ r.course_name }}</span><br>
+                <span><b>Rating: </b> {{ r.rating }}/5.0</span>
+            </div>
+
+            <div class="container block">
+                {{ r.body }}
+            </div>
+            <span>
+                <button class="button" @click="like_review(r._idx)">
+                    <span class="icon-text">
+                        <span class="icon">
+                            <i class="fa fa-thumbs-o-up"></i>
+                        </span>
+                        <span>{{ r.likers }}</span>
+                    </span>
+                </button>
+                <button class="button" @click="dislike_review(r._idx)">
+                    <span class="icon-text">
+                        <span class="icon">
+                            <i class="fa fa-thumbs-o-down"></i>
+                        </span>
+                        <span>{{ r.dislikers }}</span>
+                    </span>
+                </button>
+            </span>
+        </div>
+    </div>
 </div>
+
+
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+<script>
+    let load_instructor_reviews_url = "[[=XML(load_instructor_reviews_url)]]";
+    let add_review_url = "[[=XML(add_review_url)]]";
+    let delete_review_url = "[[=XML(delete_review_url)]]";
+    let add_like_url = "[[=XML(add_like_url)]]";
+    let flip_like_url = "[[=XML(flip_like_url)]]";
+    let delete_like_url = "[[=XML(delete_like_url)]]";
+    let author = "[[=XML(author)]]";
+    let instr_id = "[[=XML(instr_id)]]"
+</script>
+<script src="js/instructor.js"></script>
+[[end]]

@@ -89,3 +89,30 @@ success!
 timestamp: 2021-05-12T17:33:42.413711
 ALTER TABLE "instructors" ADD "department" TEXT;
 success!
+timestamp: 2021-05-20T17:32:05.805803
+CREATE TABLE "likes"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "is_like" CHAR(1),
+    "user_email" CHAR(512),
+    "review" INTEGER REFERENCES "reviews" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2021-05-20T17:55:41.014741
+ALTER TABLE "reviews" ADD "body" TEXT;
+success!
+success!
+success!
+success!
+success!
+timestamp: 2021-05-20T20:27:52.948446
+ALTER TABLE "reviews" ADD "user" CHAR(512);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!

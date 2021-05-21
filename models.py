@@ -44,8 +44,16 @@ db.define_table(
     'reviews',
     Field('course', 'reference courses', requires=IS_NOT_EMPTY()),
     Field('instructor', 'reference instructors', requires=IS_NOT_EMPTY()),
-    Field('review', 'text', requires=IS_NOT_EMPTY()),
+    Field('body', 'text', requires=IS_NOT_EMPTY()),
     Field('rating', 'double', requires=IS_FLOAT_IN_RANGE(0, 5)),
+    Field('user', requires=IS_NOT_EMPTY())
+)
+
+db.define_table(
+    'likes',
+    Field('is_like', 'boolean', requires=IS_NOT_EMPTY()),
+    Field('user_email', requires=IS_NOT_EMPTY()),
+    Field('review', 'reference reviews', requires=IS_NOT_EMPTY()),
 )
 
 db.schools.id.readable     = db.schools.id.writable     = False
