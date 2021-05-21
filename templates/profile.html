@@ -10,19 +10,75 @@
           <h1 class="title">[[=user.first_name]] [[=user.last_name]]</h1>
           <h2 class="subtitle">[[=user.email]]</h2>
 
-          [[if user.email == email:]]
-
           <button class="button">
-              Button
+              Edit Profile
           </button>
 
-          [[pass]]
+          [[if user.email == email:]]
 
+          [[pass]]
       </div>
 
       <div class="column">
-          goodbye
+          <div class="box">
+              <h1 class="title">Reviews</h1>
+
+              <div class="box">
+                  <b>Course:</b> Hell 101
+                  <p>
+                  <b>Instructor:</b> Mackey
+                  <p>
+                  <b>Rating:</b> 6/5
+                  <p>
+                  Loved it!
+
+                  <figure style="text-align: right;">
+                      <button class="button">
+                          Edit
+                      </button>
+                  </figure>
+              </div>
+
+              <div class="box">
+                  <b>Course:</b> Hell 102
+                  <p>
+                  <b>Instructor:</b> Mackey
+                  <p>
+                  <b>Rating:</b> 6/5
+                  <p>
+                  Loved it even more!
+
+                  <figure style="text-align: right;">
+                      <button class="button">
+                          Edit
+                      </button>
+                  </figure>
+              </div>
+
+              <div class="box">
+                  <b>Course:</b> Hell 103
+                  <p>
+                  <b>Instructor:</b> Mackey
+                  <p>
+                  <b>Rating:</b> 6/5
+                  <p>
+                  Loved it the most!
+
+                  <figure style="text-align: right;">
+                      <button class="button">
+                          Edit
+                      </button>
+                  </figure>
+              </div>
+
+
+
+
+
+
+          </div>
       </div>
+
   </div>
 
 </div>
