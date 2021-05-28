@@ -35,13 +35,18 @@ let init = (app) => {
     };
 
     app.calculate_rating = function () {
-        let ratings = 0.0;
-        for(let i = 0; i < app.vue.reviews.length; i++) {
-            ratings += app.vue.reviews[i].rating;
+        if(app.vue.reviews.length == 0) {
+            app.vue.rating_string = "No reviews yet...";
         }
+        else {
+            let ratings = 0.0;
+            for(let i = 0; i < app.vue.reviews.length; i++) {
+                ratings += app.vue.reviews[i].rating;
+            }
 
-        let avg_rating = ratings / app.vue.reviews.length;
-        app.vue.rating_string = avg_rating.toFixed(1).toString() + "/5.0";
+            let avg_rating = ratings / app.vue.reviews.length;
+            app.vue.rating_string = avg_rating.toFixed(1).toString() + "/5.0";
+        }
     }
 
     app.set_add_mode = function (new_mode) {
@@ -85,6 +90,7 @@ let init = (app) => {
             app.vue.is_editing = true;
             app.vue.edit_text = app.vue.reviews[rev_idx].body;
             app.vue.edit_stars_displayed = app.vue.reviews[rev_idx].rating;
+            app.vue.edit_rating = app.vue.edit_stars_displayed;
         }
     }
 
@@ -163,6 +169,7 @@ let init = (app) => {
                if(app.vue.reviews[i].id === id) {
                    app.vue.reviews.splice(i, 1);
                    app.enumerate(app.vue.reviews);
+                   app.calculate_rating();
                    break;
                }
            }
@@ -348,6 +355,7 @@ let init = (app) => {
             app.vue.courses = response.data.courses;
             app.vue.course_2_id = response.data.course_2_id;
             app.vue.reviews = reviews;
+            app.calculate_rating();
         });
     };
 
