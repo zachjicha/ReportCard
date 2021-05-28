@@ -8,7 +8,8 @@ let init = (app) => {
 
     // This is the Vue data.
     app.data = {
-        query: "",
+        course_query: "",
+        is_valid: false,
         results: [],
         courses: [],
         course_2_id: {},
@@ -32,10 +33,24 @@ let init = (app) => {
         }
     }
 
+    app.check_validity = function () {
+        if (app.vue.course_query in app.vue.course_2_id) {
+            app.vue.is_valid = true;
+        } else {
+            app.vue.is_valid = false;
+        }
+    }
+
+    app.get_go_url = function() {
+        location.href = 'course/' + app.vue.course_2_id[app.vue.course_query].toString();
+    }
+
     // This contains all the methods.
     app.methods = {
         // Complete as you see fit.
         search: app.search,
+        check_validity: app.check_validity,
+        get_go_url: app.get_go_url,
     };
 
     // This creates the Vue instance.
@@ -50,7 +65,7 @@ let init = (app) => {
         // Put here any initialization code.
         // Typically this is a server GET call to load the data.
         axios.post(
-            load_courses
+            load_courses_url
         ).then(function(response){
             app.vue.courses = response.data.courses
             app.vue.course_2_id = response.data.course_2_id

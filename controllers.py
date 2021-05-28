@@ -37,9 +37,8 @@ url_signer = URLSigner(session)
 @action.uses(db, auth, 'index.html')
 def index():
     return dict(
-        search_url = URL('search', signer=url_signer),
-        load_courses = URL('load_courses', signer=url_signer)
-
+        search_url=URL('search', signer=url_signer),
+        load_courses_url=URL('load_courses', signer=url_signer)
     )
 
 @action('profile/<user_id:int>')
