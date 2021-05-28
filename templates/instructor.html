@@ -25,13 +25,25 @@
                 <div class="field">
                     <label class="label">Course Name</label>
                     <div class="control">
-                        <input class="input" type="text" v-model="new_course">
+                        <!-- <input class="input" type="text" v-model="new_course"> -->
+                        <input class="input" type="text" list="courses" v-model="new_course">
+                        <datalist id="courses">
+                            <option v-for="c in courses">
+                                {{ c }}
+                            </option>
+                        </datalist>
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Rating</label>
                     <div class="control">
-                        <input class="input" type="text" v-model="new_rating">
+                        <!-- <input class="input" type="text" v-model="new_rating"> -->
+                        <span @mouseout="stars_out">
+                            <span @mouseover="star_over(star_idx)" @click="set_star(star_idx)" v-for="star_idx in [1, 2, 3, 4, 5]">
+                                <i v-if="star_idx <= stars_displayed" class="fa fa-star fa-2x"></i>
+                                <i v-else class="fa fa-star-o fa-2x"></i>
+                            </span>
+                        </span>
                     </div>
                 </div>
                 <div class="field">
@@ -48,8 +60,8 @@
                 </div>
             </div>
         </div>
-
     </div>
+
     <div class="section" id="instr-page">
         <h1 class="title">Reviews</h1>
 
@@ -59,6 +71,8 @@
             <div class="block">
                 <span><b>Course: </b> {{ r.course_name }}</span><br>
                 <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span>
+
+            </div>
 
             <div class="block">
                 {{ r.body }}

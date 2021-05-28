@@ -11,8 +11,11 @@ let init = (app) => {
     app.data = {
         // Complete as you see fit.
         reviews: [],
+        courses: [],
+        course_2_id: {},
         add_mode: false,
-        new_rating: "",
+        stars_displayed: 0,
+        new_rating: 0,
         new_course: "",
         new_body: "",
         author: author,
@@ -43,14 +46,29 @@ let init = (app) => {
 
     app.reset_form = function () {
         app.vue.new_body = "";
+        app.vue.new_rating = 0;
+        app.vue.new_course = "";
+        app.vue.stars_displayed = 0;
     };
+
+    app.stars_out = function () {
+        app.vue.stars_displayed = app.vue.new_rating;
+    }
+
+    app.set_star = function (star_idx) {
+        app.vue.new_rating = star_idx;
+    }
+
+    app.star_over = function (star_idx) {
+        app.vue.stars_displayed = star_idx;
+    }
 
     app.add_review = function () {
         let body = app.vue.new_body;
         axios.post(
             add_review_url,
             {
-                course: app.vue.new_course,
+                course: app.vue.course_2_id[app.vue.new_course],
                 instructor: instr_id,
                 body: body,
                 rating: parseFloat(app.vue.new_rating),
@@ -231,6 +249,9 @@ let init = (app) => {
         like_review: app.like_review,
         dislike_review: app.dislike_review,
         set_hover: app.set_hover,
+        star_over: app.star_over,
+        stars_out: app.stars_out,
+        set_star: app.set_star,
     };
 
     // This creates the Vue instance.
@@ -265,6 +286,8 @@ let init = (app) => {
                 }
             }
 
+            app.vue.courses = response.data.courses;
+            app.vue.course_2_id = response.data.course_2_id;
             app.vue.reviews = reviews;
         });
     };

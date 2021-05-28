@@ -116,8 +116,23 @@ def course(instr_id=None):
 @action('load_instructor_reviews', method="POST")
 @action.uses(url_signer.verify(), db)
 def load_instructor_reviews():
+
     instr_id = request.json.get('instr_id')
     assert instr_id is not None
+
+    instr_info = db(db.instructors.id == instr_id).select().first()
+    assert instr_info is not None
+
+    school_id = instr_info.school
+    courses_info = db(db.courses.school == school_id).select()
+    assert courses_info is not None
+    courses = []
+    course_2_id = {}
+
+    for c in courses_info:
+        courses.append(c.name)
+        course_2_id[c.name] = c.id
+
     reviews = db(db.reviews.instructor == instr_id).select().as_list()
     likes = db(db.likes.user_email == get_user_email()).select().as_list()
     assert reviews is not None
@@ -138,7 +153,7 @@ def load_instructor_reviews():
             else:
                 review["dislikers"] += 1
 
-    return dict(reviews=reviews, likes=likes)
+    return dict(reviews=reviews, likes=likes, courses=courses, course_2_id=course_2_id)
 
 @action('add_review', method="POST")
 @action.uses(url_signer.verify(), db)
