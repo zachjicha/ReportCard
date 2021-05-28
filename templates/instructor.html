@@ -70,13 +70,42 @@
         <div class="box" v-for="r in reviews">
             <div class="block">
                 <span><b>Course: </b> {{ r.course_name }}</span><br>
-                <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span>
+                <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span><br>
+                <span><b>User: </b> {{ r.user }}</span>
 
             </div>
 
-            <div class="block">
+            <div class="block" v-if="r.is_editing">
+                <div class="form">
+                    <div class="field">
+                        <label class="label">Rating</label>
+                        <div class="control">
+                            <span @mouseout="edit_stars_out">
+                                <span @mouseover="edit_star_over(star_idx)" @click="edit_set_star(star_idx)" v-for="star_idx in [1, 2, 3, 4, 5]">
+                                    <i v-if="star_idx <= edit_stars_displayed" class="fa fa-star fa-2x"></i>
+                                    <i v-else class="fa fa-star-o fa-2x"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Edit Review:</label>
+                        <div class="control">
+                            <textarea class="textarea" type="text" v-model="edit_text"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button class="button is-success" @click="save_edit(r._idx, r.id)">
+                    Save
+                </button>
+                <button class="button is-danger" @click="cancel_edit(r._idx)">
+                    Cancel
+                </button>
+            </div>
+            <div class="block" v-else>
                 {{ r.body }}
             </div>
+
             <div class="block">
                 <button class="button" v-if="logged_in" @click="like_review(r._idx)">
                     <span class="icon-text">
@@ -95,7 +124,6 @@
                     </span>
                 </button>
 
-
                 <button class="button" v-if="logged_in" @click="dislike_review(r._idx)">
                     <span class="icon-text">
                         <span class="icon">
@@ -110,6 +138,18 @@
                             <i class="fa fa-thumbs-o-down"></i>
                         </span>
                         <span>{{ r.dislikers }}</span>
+                    </span>
+                </button>
+
+                <button class="button is-warning" v-if="r.user == author" @click="start_edit(r._idx)">
+                    <span class="icon">
+                        <i class="fa fa-pencil"></i>
+                    </span>
+                </button>
+
+                <button class="button is-danger" v-if="r.user == author" @click="delete_review(r._idx)">
+                    <span class="icon">
+                        <i class="fa fa-trash"></i>
                     </span>
                 </button>
             </div>
@@ -127,6 +167,7 @@
     let add_like_url = "[[=XML(add_like_url)]]";
     let flip_like_url = "[[=XML(flip_like_url)]]";
     let delete_like_url = "[[=XML(delete_like_url)]]";
+    let edit_review_url = "[[=XML(edit_review_url)]]"
     let author = "[[=XML(author)]]";
     let instr_id = "[[=XML(instr_id)]]";
     let logged_in = ("[[=XML(logged_in)]]" === "True");

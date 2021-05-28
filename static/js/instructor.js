@@ -14,6 +14,10 @@ let init = (app) => {
         courses: [],
         course_2_id: {},
         add_mode: false,
+        is_editing: false,
+        edit_text: "",
+        edit_stars_displayed: 0,
+        edit_rating: 0,
         stars_displayed: 0,
         new_rating: 0,
         new_course: "",
@@ -63,6 +67,52 @@ let init = (app) => {
         app.vue.stars_displayed = star_idx;
     }
 
+    app.edit_stars_out = function () {
+        app.vue.edit_stars_displayed = app.vue.edit_rating;
+    }
+
+    app.edit_set_star = function (star_idx) {
+        app.vue.edit_rating = star_idx;
+    }
+
+    app.edit_star_over = function (star_idx) {
+        app.vue.edit_stars_displayed = star_idx;
+    }
+
+    app.start_edit = function (rev_idx) {
+        if(!app.vue.is_editing) {
+            app.vue.reviews[rev_idx].is_editing = true;
+            app.vue.is_editing = true;
+            app.vue.edit_text = app.vue.reviews[rev_idx].body;
+            app.vue.edit_stars_displayed = app.vue.reviews[rev_idx].rating;
+        }
+    }
+
+    app.save_edit = function (rev_idx, rev_id) {
+        axios.post(
+            edit_review_url,
+            {
+                id: rev_id,
+                body: app.vue.edit_text,
+                rating: app.vue.edit_rating,
+            }
+        ).then(function (response) {
+            app.vue.reviews[rev_idx].is_editing = false;
+            app.vue.reviews[rev_idx].body = app.vue.edit_text;
+            app.vue.reviews[rev_idx].rating = app.vue.edit_rating;
+            app.vue.is_editing = false;
+            app.vue.edit_text = "";
+            app.calculate_rating();
+        });
+    }
+
+    app.cancel_edit = function (rev_idx) {
+        app.vue.reviews[rev_idx].is_editing = false;
+        app.vue.is_editing = false;
+        app.vue.edit_text = "";
+        app.vue.edit_stars_displayed = 0;
+    }
+
     app.add_review = function () {
         let body = app.vue.new_body;
         axios.post(
@@ -86,6 +136,8 @@ let init = (app) => {
                 likers: 0,
                 dislikers: 0,
                 hover: false,
+                user: author,
+                is_editing: false,
             });
             app.enumerate(app.vue.reviews);
             app.calculate_rating();
@@ -101,8 +153,8 @@ let init = (app) => {
         app.vue.add_mode = false;
     };
 
-    app.delete_review = function (post_idx) {
-        let id = app.vue.reviews[post_idx].id;
+    app.delete_review = function (rev_idx) {
+        let id = app.vue.reviews[rev_idx].id;
         axios.post(
             delete_review_url,
             {id: id}
@@ -252,6 +304,12 @@ let init = (app) => {
         star_over: app.star_over,
         stars_out: app.stars_out,
         set_star: app.set_star,
+        start_edit: app.start_edit,
+        save_edit: app.save_edit,
+        cancel_edit: app.cancel_edit,
+        edit_star_over: app.edit_star_over,
+        edit_stars_out: app.edit_stars_out,
+        edit_set_star: app.edit_set_star,
     };
 
     // This creates the Vue instance.
@@ -277,6 +335,7 @@ let init = (app) => {
                 reviews[i].hover = false;
                 reviews[i].liked = 0;
                 reviews[i]._like_id = -1;
+                reviews[i].is_editing = false;
                 for(let j = 0; j < likes.length; j++) {
                     if(likes[j].review == reviews[i].id) {
                         reviews[i].liked = likes[j].is_like ? 1 : 2;

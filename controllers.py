@@ -105,6 +105,7 @@ def course(instr_id=None):
                 load_instructor_reviews_url=URL('load_instructor_reviews', signer=url_signer),
                 add_review_url=URL('add_review', signer=url_signer),
                 delete_review_url=URL('delete_review', signer=url_signer),
+                edit_review_url=URL('edit_review', signer=url_signer),
                 add_like_url=URL('add_like', signer=url_signer),
                 flip_like_url=URL('flip_like', signer=url_signer),
                 delete_like_url=URL('delete_like', signer=url_signer),
@@ -184,6 +185,27 @@ def add_review():
     assert course_description is not None
 
     return dict(id=new_id, fail=False, course_name=course_description.name)
+
+@action('edit_review', method="POST")
+@action.uses(url_signer.verify(), db)
+def edit_review():
+    review_id = request.json.get('id')
+    new_body = request.json.get('body')
+    new_rating = request.json.get('rating')
+    assert review_id is not None
+    assert new_body is not None
+    assert new_rating is not None
+
+    db(db.reviews.id == review_id).update(body=new_body, rating=new_rating)
+    return "ok"
+
+@action('delete_review', method="POST")
+@action.uses(url_signer.verify(), db)
+def delete_review():
+    review_id = request.json.get('id')
+    assert review_id is not None
+    db(db.reviews.id == review_id).delete()
+    return "ok"
 
 @action('add_like', method="POST")
 @action.uses(url_signer.verify(), db)
