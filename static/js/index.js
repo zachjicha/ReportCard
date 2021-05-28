@@ -10,6 +10,8 @@ let init = (app) => {
     app.data = {
         query: "",
         results: [],
+        courses: [],
+        course_2_id: {},
     };
 
     app.enumerate = (a) => {
@@ -47,6 +49,12 @@ let init = (app) => {
     app.init = () => {
         // Put here any initialization code.
         // Typically this is a server GET call to load the data.
+        axios.post(
+            load_courses
+        ).then(function(response){
+            app.vue.courses = response.data.courses
+            app.vue.course_2_id = response.data.course_2_id
+        })
     };
 
     // Call to the initializer.

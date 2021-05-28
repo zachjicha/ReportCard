@@ -36,7 +36,11 @@ url_signer = URLSigner(session)
 @action('index')
 @action.uses(db, auth, 'index.html')
 def index():
-    return dict()
+    return dict(
+        search_url = URL('search', signer=url_signer),
+        load_courses = URL('load_courses', signer=url_signer)
+
+    )
 
 @action('profile/<user_id:int>')
 @action.uses(db, session, 'profile.html')
@@ -234,3 +238,19 @@ def delete_like():
     assert like_id is not None
     db(db.likes.id == like_id).delete()
     return "ok"
+
+@action('load_courses', method="POST")
+@action.uses(url_signer.verify(), db)
+def load_courses():
+    courses_info = db(db.courses).select()
+    courses = []
+    course_2_id = {}
+
+    for c in courses_info:
+        courses.append(c.name)
+        course_2_id[c.name] = c.id
+
+    return dict(
+        courses = courses,
+        course_2_id = course_2_id
+    )
