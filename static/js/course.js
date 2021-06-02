@@ -133,7 +133,7 @@ let init = (app) => {
             app.vue.reviews.push({
                 id: response.data.id,
                 body: body,
-                course: app.vue.course_2_id[app.vue.new_course],
+                course: app.vue.new_course,
                 course_name: response.data.course_name,
                 instructor: instr_id,
                 rating: parseFloat(app.vue.new_rating),
