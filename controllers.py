@@ -30,6 +30,7 @@ from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
+from py4web.utils.form import Form, FormStyleBulma
 
 url_signer = URLSigner(session)
 
@@ -37,7 +38,8 @@ url_signer = URLSigner(session)
 @action.uses(db, auth, 'index.html')
 def index():
     return dict(
-        load_everything_url=URL('load_everything', signer=url_signer)
+        load_everything_url=URL('load_everything', signer=url_signer),
+        url_signer=url_signer,
     )
 
 @action('profile/<user_id:int>')
@@ -46,6 +48,28 @@ def profile(user_id=None):
     assert user_id is not None
 
     return dict(user=db(db.auth_user.id == user_id).select().first(), email=get_user_email())
+
+@action('add_course', method=["GET", "POST"])
+@action.uses(db, session, auth.user, url_signer.verify(), 'add_course.html')
+def add_course():
+    form = Form(db.courses, csrf_session=session, formstyle=FormStyleBulma)
+    if form.accepted:
+        # Redirect back to index
+        redirect(URL('index'))
+    else:
+        # GET or not accepted, so error
+        return dict(form=form)
+
+@action('add_instructor', method=["GET", "POST"])
+@action.uses(db, session, auth.user, 'add_instructor.html')
+def add_instructor():
+    form = Form(db.instructors, csrf_session=session, formstyle=FormStyleBulma)
+    if form.accepted:
+        # Redirect back to index
+        redirect(URL('index'))
+    else:
+        # GET or not accepted, so error
+        return dict(form=form)
 
 @action('course/<course_id:int>')
 @action.uses(db, session, 'course.html')
@@ -200,7 +224,7 @@ def load_course_reviews():
         instructors.append(name)
         instr_2_id[name] = i.id
 
-    reviews = db(db.reviews.instructor == course_id).select().as_list()
+    reviews = db(db.reviews.course == course_id).select().as_list()
     likes = db(db.likes.user_email == get_user_email()).select().as_list()
     assert reviews is not None
     assert likes is not None

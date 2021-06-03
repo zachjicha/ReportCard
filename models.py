@@ -28,16 +28,16 @@ db.define_table(
 db.define_table(
     'courses',
     Field('name', requires=IS_NOT_EMPTY()),
-    Field('school', 'reference schools', requires=IS_NOT_EMPTY()),
-    Field('description', 'text'),
+    Field('school', 'reference schools', default=1, requires=IS_NOT_EMPTY()),
+    Field('description', 'text', default="", requires=IS_NOT_EMPTY()),
 )
 
 db.define_table(
     'instructors',
     Field('first_name', requires=IS_NOT_EMPTY()),
     Field('last_name', requires=IS_NOT_EMPTY()),
-    Field('school', 'reference schools', requires=IS_NOT_EMPTY()),
-    Field('department', 'text', requires=IS_NOT_EMPTY()),
+    Field('school', 'reference schools', default=1, requires=IS_NOT_EMPTY()),
+    Field('department', 'text',  default="", requires=IS_NOT_EMPTY()),
 )
 
 db.define_table(
@@ -60,5 +60,9 @@ db.schools.id.readable     = db.schools.id.writable     = False
 db.courses.id.readable     = db.courses.id.writable     = False
 db.instructors.id.readable = db.instructors.id.writable = False
 db.reviews.id.readable     = db.reviews.id.writable     = False
+
+# Since this is only for UCSC, we will always write UCSC's id
+db.courses.school.readable = db.courses.school.writable = False
+db.instructors.school.readable = db.instructors.school.writable = False
 
 db.commit()
