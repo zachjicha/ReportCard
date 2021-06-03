@@ -6,7 +6,7 @@
     }
 </style>
 
-<div class="container" id="vue-target" v-cloak>
+<div class="container" id="home-page" v-cloak>
 
     <div class="section">
         <figure>
@@ -16,28 +16,57 @@
         <div class="section has-text-centered">
             <div class="block">
                 <div class="form">
-                    <div class="control">
-                        <input class="input" type="text" list="courses" v-model="course_query" @keyup="check_validity">
-                        <datalist id="courses">
-                            <option v-for="c in courses">{{ c }}</option>
-                        </datalist>
+                    <div class="label">Search for a course</div>
+                    <div class="field has-addons has-addons-centered">
+                        <div class="control">
+                            <input class="input" type="text" list="courses" v-model="course_query" @keyup="check_course_validity">
+                            <datalist id="courses">
+                                <option v-for="c in courses">{{ c }}</option>
+                            </datalist>
+                        </div>
+                        <div class="control">
+                            <button class="button is-success" v-if="course_is_valid" @click="course_go">
+                                Go!
+                            </button>
+                            <button class="button is-success" disabled v-else>
+                                Go!
+                            </button>
+                        </div>
                     </div>
-                    <p class="help is-danger" v-if="!is_valid">
+                    <p class="help is-danger" v-if="!course_is_valid">
                         Please enter a valid course
                     </p>
                 </div>
-
             </div>
 
             <div class="block">
-                <button class="button is-success" v-if="is_valid">
-                    Go!
-                </button>
-                <button class="button is-success" disabled v-else>
-                    Go!
-                </button>
+                <label class="label">or</label>
             </div>
 
+            <div class="block">
+                <div class="form">
+                    <div class="label">Search for an instructor</div>
+                    <div class="field has-addons has-addons-centered">
+                        <div class="control">
+                            <input class="input" type="text" list="instrs" v-model="instr_query" @keyup="check_instr_validity">
+                            <datalist id="instrs">
+                                <option v-for="i in instrs">{{ i }}</option>
+                            </datalist>
+                        </div>
+                        <div class="control">
+                            <button class="button is-success" v-if="instr_is_valid" @click="instr_go">
+                                Go!
+                            </button>
+                            <button class="button is-success" disabled v-else>
+                                Go!
+                            </button>
+                        </div>
+                    </div>
+                    <p class="help is-danger" v-if="!is_valid">
+                        Please enter a valid instructor
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -45,8 +74,7 @@
 [[block page_scripts]]
 <!-- Loads the index-specific js for Vue -->
 <script>
-let search_url = "[[=XML(search_url)]]";
-let load_courses_url = "[[=XML(load_courses_url)]]";
+let load_everything_url = "[[=XML(load_everything_url)]]";
 </script>
 <script src="js/index.js"></script>
 [[end]]

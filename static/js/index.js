@@ -9,10 +9,13 @@ let init = (app) => {
     // This is the Vue data.
     app.data = {
         course_query: "",
-        is_valid: false,
-        results: [],
+        instr_query: "",
+        course_is_valid: false,
+        instr_is_valid: false,
         courses: [],
+        instrs: [],
         course_2_id: {},
+        instr_2_id: {},
     };
 
     app.enumerate = (a) => {
@@ -22,40 +25,35 @@ let init = (app) => {
         return a;
     };
 
-    app.search = function () {
-        if (app.vue.query.length > 1) {
-            axios.get(search_url, {params: {q: app.vue.query}})
-                .then(function (result) {
-                    app.vue.results = result.data.results;
-                });
-        } else {
-            app.vue.results = [];
-        }
+    app.check_course_validity = function () {
+        app.vue.course_is_valid = app.vue.course_query in app.vue.course_2_id;
     }
 
-    app.check_validity = function () {
-        if (app.vue.course_query in app.vue.course_2_id) {
-            app.vue.is_valid = true;
-        } else {
-            app.vue.is_valid = false;
-        }
+    app.check_instr_validity = function () {
+        app.vue.instr_is_valid = app.vue.instr_query in app.vue.instr_2_id;
     }
 
-    app.get_go_url = function() {
-        location.href = 'course/' + app.vue.course_2_id[app.vue.course_query].toString();
+    app.course_go = function() {
+        let dest = '../course/' + app.vue.course_2_id[app.vue.course_query].toString();
+        window.location.href = dest;
+    }
+
+    app.instr_go = function() {
+        let dest = '../instructor/' + app.vue.instr_2_id[app.vue.instr_query].toString();
+        window.location.href = dest;
     }
 
     // This contains all the methods.
     app.methods = {
-        // Complete as you see fit.
-        search: app.search,
-        check_validity: app.check_validity,
-        get_go_url: app.get_go_url,
+        check_course_validity: app.check_course_validity,
+        check_instr_validity: app.check_instr_validity,
+        course_go: app.course_go,
+        instr_go: app.instr_go,
     };
 
     // This creates the Vue instance.
     app.vue = new Vue({
-        el: "#vue-target",
+        el: "#home-page",
         data: app.data,
         methods: app.methods
     });
@@ -65,10 +63,12 @@ let init = (app) => {
         // Put here any initialization code.
         // Typically this is a server GET call to load the data.
         axios.post(
-            load_courses_url
+            load_everything_url
         ).then(function(response){
-            app.vue.courses = response.data.courses
-            app.vue.course_2_id = response.data.course_2_id
+            app.vue.courses = response.data.courses;
+            app.vue.instrs = response.data.instrs;
+            app.vue.course_2_id = response.data.course_2_id;
+            app.vue.instr_2_id = response.data.instr_2_id;
         })
     };
 

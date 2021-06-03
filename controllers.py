@@ -37,8 +37,7 @@ url_signer = URLSigner(session)
 @action.uses(db, auth, 'index.html')
 def index():
     return dict(
-        search_url=URL('search', signer=url_signer),
-        load_courses_url=URL('load_courses', signer=url_signer)
+        load_everything_url=URL('load_everything', signer=url_signer)
     )
 
 @action('profile/<user_id:int>')
@@ -223,6 +222,36 @@ def load_course_reviews():
 
     return dict(reviews=reviews, likes=likes, instructors=instructors, instr_2_id=instr_2_id)
 
+@action('load_everything', method="POST")
+@action.uses(url_signer.verify(), db)
+def load_everything():
+    courses_info = db(db.courses).select()
+    instrs_info = db(db.instructors).select()
+
+    assert courses_info is not None
+    assert instrs_info is not None
+
+    courses = []
+    instrs = []
+    course_2_id = {}
+    instr_2_id = {}
+
+    for c in courses_info:
+        courses.append(c.name)
+        course_2_id[c.name] = c.id
+
+    for i in instrs_info:
+        name = i.first_name + " " + i.last_name
+        instrs.append(name)
+        instr_2_id[name] = i.id
+
+    return dict(
+        courses=courses,
+        course_2_id=course_2_id,
+        instrs=instrs,
+        instr_2_id=instr_2_id,
+    )
+
 @action('add_review', method="POST")
 @action.uses(url_signer.verify(), db)
 def add_review():
@@ -301,19 +330,3 @@ def delete_like():
     assert like_id is not None
     db(db.likes.id == like_id).delete()
     return "ok"
-
-@action('load_courses', method="POST")
-@action.uses(url_signer.verify(), db)
-def load_courses():
-    courses_info = db(db.courses).select()
-    courses = []
-    course_2_id = {}
-
-    for c in courses_info:
-        courses.append(c.name)
-        course_2_id[c.name] = c.id
-
-    return dict(
-        courses = courses,
-        course_2_id = course_2_id
-    )
