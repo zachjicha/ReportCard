@@ -11,8 +11,8 @@ let init = (app) => {
     app.data = {
         // Complete as you see fit.
         reviews: [],
-        courses: [],
-        course_2_id: {},
+        instructors: [],
+        instr_2_id: {},
         add_mode: false,
         is_editing: false,
         edit_text: "",
@@ -20,7 +20,7 @@ let init = (app) => {
         edit_rating: 0,
         stars_displayed: 0,
         new_rating: 0,
-        new_course: "",
+        new_instr: "",
         new_body: "",
         author: author,
         logged_in: logged_in,
@@ -56,7 +56,7 @@ let init = (app) => {
     app.reset_form = function () {
         app.vue.new_body = "";
         app.vue.new_rating = 0;
-        app.vue.new_course = "";
+        app.vue.new_instr = "";
         app.vue.stars_displayed = 0;
     };
 
@@ -124,8 +124,8 @@ let init = (app) => {
         axios.post(
             add_review_url,
             {
-                course: app.vue.course_2_id[app.vue.new_course],
-                instructor: instr_id,
+                course: course_id,
+                instructor: app.vue.instr_2_id[app.vue.new_instr],
                 body: body,
                 rating: parseFloat(app.vue.new_rating),
             }
@@ -133,9 +133,10 @@ let init = (app) => {
             app.vue.reviews.push({
                 id: response.data.id,
                 body: body,
-                course: app.vue.new_course,
+                course: course_id,
                 course_name: response.data.course_name,
-                instructor: instr_id,
+                instructor: app.vue.instr_2_id[app.vue.new_instr],
+                instr_name: app.vue.new_instr,
                 rating: parseFloat(app.vue.new_rating),
                 liked: 0,
                 _like_id: -1,
@@ -321,7 +322,7 @@ let init = (app) => {
 
     // This creates the Vue instance.
     app.vue = new Vue({
-        el: "#instr-page",
+        el: "#course-page",
         data: app.data,
         methods: app.methods
     });
@@ -331,8 +332,8 @@ let init = (app) => {
         // Put here any initialization code.
         // Typically this is a server GET call to load the data.
         axios.post(
-            load_instructor_reviews_url,
-            {instr_id: instr_id},
+            load_course_reviews_url,
+            {course_id: course_id},
         ).then(function (response) {
             let reviews = response.data.reviews;
             app.enumerate(reviews);
@@ -352,8 +353,8 @@ let init = (app) => {
                 }
             }
 
-            app.vue.courses = response.data.courses;
-            app.vue.course_2_id = response.data.course_2_id;
+            app.vue.instructors = response.data.instructors;
+            app.vue.instr_2_id = response.data.instr_2_id;
             app.vue.reviews = reviews;
             app.calculate_rating();
         });

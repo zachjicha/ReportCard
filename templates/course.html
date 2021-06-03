@@ -1,34 +1,175 @@
 [[extend 'layout.html']]
 
-<div class="section">
+<style>
+[v-cloak] {
+     display: none;
+}
+</style>
 
-    <h1 class="title">[[=course.name]]</h1>
-    <h2 class="subtitle">[[=course.description]]<br>[[=rating]]</h2>
+<div class="container" id="course-page" v-cloak>
+    <div class="section">
 
-    <button class="button">
-        <span>Rate this course</span>
-    </button>
+        <h1 class="title">[[=course.name]]</h1>
+        <h2 class="subtitle">[[=course.description]]<br>{{ rating_string }}</h2>
 
-</div>
-
-<div class="section">
-    <h1 class="title">Reviews</h1>
-
-    <hr>
-
-    [[for review in reviews:]]
-    <div class="box">
-        <span><b>Instructor: </b>[[=review["fname"] ]] [[=review["lname"] ]]</span><br>
-        <span><b>Rating: </b> [[=review["rating"] ]]/5.0</span><br>
-        <span>[[=review["review"] ]]</span><br>
-        <span>
-            <button class="button">
-                <span class="icon"><i class="fa fa-thumbs-o-up"></i></span>
+        <div v-if="!add_mode">
+            <button class="button" v-if="logged_in" @click="set_add_mode(true)">
+                <span>Rate this course</span>
             </button>
-            <button class="button">
-                <span class="icon"><i class="fa fa-thumbs-o-down"></i></span>
+            <button class="button" v-else disabled>
+                <span>Log in to rate this course</span>
             </button>
-        </span>
+        </div>
+        <div v-else>
+            <div class="form">
+                <div class="field">
+                    <label class="label">Instructor Name</label>
+                    <div class="control">
+                        <!-- <input class="input" type="text" v-model="new_course"> -->
+                        <input class="input" type="text" list="instructors" v-model="new_instr">
+                        <datalist id="instructors">
+                            <option v-for="i in instructors">
+                                {{ i }}
+                            </option>
+                        </datalist>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Rating</label>
+                    <div class="control">
+                        <span @mouseout="stars_out">
+                            <span @mouseover="star_over(star_idx)" @click="set_star(star_idx)" v-for="star_idx in [1, 2, 3, 4, 5]">
+                                <i v-if="star_idx <= stars_displayed" class="fa fa-star fa-2x"></i>
+                                <i v-else class="fa fa-star-o fa-2x"></i>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Review</label>
+                    <div class="control">
+                        <textarea class="textarea" type="text" v-model="new_body"></textarea>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-success" @click="add_review">Post Review</button>
+                        <button class="button is-danger" @click="cancel_review">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    [[pass]]
+
+    <div class="section">
+        <h1 class="title">Reviews</h1>
+
+        <hr>
+
+        <div class="box" v-for="r in reviews">
+            <div class="block">
+                <span><b>Instructor: </b> {{ r.instr_name }}</span><br>
+                <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span><br>
+                <span><b>User: </b> {{ r.user }}</span>
+
+            </div>
+
+            <div class="block" v-if="r.is_editing">
+                <div class="form">
+                    <div class="field">
+                        <label class="label">Rating</label>
+                        <div class="control">
+                            <span @mouseout="edit_stars_out">
+                                <span @mouseover="edit_star_over(star_idx)" @click="edit_set_star(star_idx)" v-for="star_idx in [1, 2, 3, 4, 5]">
+                                    <i v-if="star_idx <= edit_stars_displayed" class="fa fa-star fa-2x"></i>
+                                    <i v-else class="fa fa-star-o fa-2x"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Edit Review:</label>
+                        <div class="control">
+                            <textarea class="textarea" type="text" v-model="edit_text"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button class="button is-success" @click="save_edit(r._idx, r.id)">
+                    Save
+                </button>
+                <button class="button is-danger" @click="cancel_edit(r._idx)">
+                    Cancel
+                </button>
+            </div>
+            <div class="block" v-else>
+                {{ r.body }}
+            </div>
+
+            <div class="block">
+                <button class="button" v-if="logged_in" @click="like_review(r._idx)">
+                    <span class="icon-text">
+                        <span class="icon">
+                            <i class="fa fa-thumbs-o-up"></i>
+                        </span>
+                        <span>{{ r.likers }}</span>
+                    </span>
+                </button>
+                <button class="button" v-else disabled>
+                    <span class="icon-text">
+                        <span class="icon">
+                            <i class="fa fa-thumbs-o-up"></i>
+                        </span>
+                        <span>{{ r.likers }}</span>
+                    </span>
+                </button>
+
+                <button class="button" v-if="logged_in" @click="dislike_review(r._idx)">
+                    <span class="icon-text">
+                        <span class="icon">
+                            <i class="fa fa-thumbs-o-down"></i>
+                        </span>
+                        <span>{{ r.dislikers }}</span>
+                    </span>
+                </button>
+                <button class="button" v-else disabled>
+                    <span class="icon-text">
+                        <span class="icon">
+                            <i class="fa fa-thumbs-o-down"></i>
+                        </span>
+                        <span>{{ r.dislikers }}</span>
+                    </span>
+                </button>
+
+                <button class="button is-warning" v-if="r.user == author" @click="start_edit(r._idx)">
+                    <span class="icon">
+                        <i class="fa fa-pencil"></i>
+                    </span>
+                </button>
+
+                <button class="button is-danger" v-if="r.user == author" @click="delete_review(r._idx)">
+                    <span class="icon">
+                        <i class="fa fa-trash"></i>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+<script>
+    let load_course_reviews_url = "[[=XML(load_course_reviews_url)]]";
+    let add_review_url = "[[=XML(add_review_url)]]";
+    let delete_review_url = "[[=XML(delete_review_url)]]";
+    let add_like_url = "[[=XML(add_like_url)]]";
+    let flip_like_url = "[[=XML(flip_like_url)]]";
+    let delete_like_url = "[[=XML(delete_like_url)]]";
+    let edit_review_url = "[[=XML(edit_review_url)]]"
+    let author = "[[=XML(author)]]";
+    let course_id = "[[=XML(course_id)]]";
+    let logged_in = ("[[=XML(logged_in)]]" === "True");
+    let rating_string = "[[=XML(rating_string)]]";
+</script>
+<script src="js/course.js"></script>
+[[end]]

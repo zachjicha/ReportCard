@@ -55,21 +55,41 @@ def course(course_id=None):
 
     course_info = db(db.courses.id == course_id).select().first()
     reviews = db(db.reviews.course == course_id).select().as_list()
+
+    assert course_info is not None
+    assert reviews is not None
+
+    logged_in = True if get_user_email() is not None else False
+
     ratings = []
+    school = db(db.schools.id == course_info.school).select().first().name
 
     for review in reviews:
         ratings.append(review["rating"])
         instructor = db(db.instructors.id == review["instructor"]).select().first()
-        review["fname"] = instructor.first_name
-        review["lname"] = instructor.last_name
+        review["instr_name"] = instructor.first_name + " " + instructor.last_name
 
     if ratings:
         avg_rating = sum(ratings)/len(ratings)
-        rating_string = str(avg_rating) + "/5.0"
+        rating_string = "{:.1f}/5.0".format(avg_rating)
     else:
         rating_string = "No ratings yet..."
 
-    return dict(course=course_info, reviews=reviews, rating=rating_string)
+    return dict(course=course_info,
+                reviews=reviews,
+                rating_string=rating_string,
+                logged_in=logged_in,
+                school=school,
+                author=get_user_email(),
+                course_id=course_id,
+                load_course_reviews_url=URL('load_course_reviews', signer=url_signer),
+                add_review_url=URL('add_review', signer=url_signer),
+                delete_review_url=URL('delete_review', signer=url_signer),
+                edit_review_url=URL('edit_review', signer=url_signer),
+                add_like_url=URL('add_like', signer=url_signer),
+                flip_like_url=URL('flip_like', signer=url_signer),
+                delete_like_url=URL('delete_like', signer=url_signer),
+    )
 
 @action('instructor/<instr_id:int>')
 @action.uses(db, session, auth, 'instructor.html')
@@ -158,6 +178,50 @@ def load_instructor_reviews():
                 review["dislikers"] += 1
 
     return dict(reviews=reviews, likes=likes, courses=courses, course_2_id=course_2_id)
+
+@action('load_course_reviews', method="POST")
+@action.uses(url_signer.verify(), db)
+def load_course_reviews():
+
+    course_id = request.json.get('course_id')
+    assert course_id is not None
+
+    course_info = db(db.courses.id == course_id).select().first()
+    assert course_info is not None
+
+    school_id = course_info.school
+    instr_info = db(db.instructors.school == school_id).select()
+    assert instr_info is not None
+
+    instructors = []
+    instr_2_id = {}
+
+    for i in instr_info:
+        name = i.first_name + " " + i.last_name
+        instructors.append(name)
+        instr_2_id[name] = i.id
+
+    reviews = db(db.reviews.instructor == course_id).select().as_list()
+    likes = db(db.likes.user_email == get_user_email()).select().as_list()
+    assert reviews is not None
+    assert likes is not None
+
+    # Add all people who liked each post to each post and other info
+    for review in reviews:
+        instr_description = db(db.instructors.id == review["instructor"]).select().first()
+        assert instr_description is not None
+        review["instr_name"] = instr_description.first_name + " " + instr_description.last_name
+
+        review_likes = db(db.likes.review == review["id"]).select()
+        review["likers"] = 0
+        review["dislikers"] = 0
+        for like in review_likes:
+            if like["is_like"]:
+                review["likers"] += 1
+            else:
+                review["dislikers"] += 1
+
+    return dict(reviews=reviews, likes=likes, instructors=instructors, instr_2_id=instr_2_id)
 
 @action('add_review', method="POST")
 @action.uses(url_signer.verify(), db)
