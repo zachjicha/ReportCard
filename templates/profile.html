@@ -18,24 +18,6 @@
                 <h1 class="title">[[=user_info.first_name]] [[=user_info.last_name]]</h1>
                 <h2 class="subtitle">[[=user_info.email]]</h2>
 
-                <div class="field has-addons">
-                    <p class="control">
-                        <div class="file is-info">
-                        <label class="file-label">
-                            <input class="file-input" type="file" @change="upload_pfp($event)">
-                            <span class="file-cta">
-                                <span class="file-icon">
-                                    <i v-if="uploading" class="fa fa-spinner fa-pulse fa-fw"></i>
-                                    <i v-else class="fa fa-upload fa-fw"></i>
-                                </span>
-                                <span class="file-label">
-                                    <span v-if="!uploading">Upload new file</span>
-                                </span>
-                            </span>
-                        </label>
-                    </div>
-                    </p>
-                </div>
             </div>
 
             <div class="column">
@@ -150,9 +132,6 @@
     let edit_review_url = "[[=XML(edit_review_url)]]";
     let user_id = "[[=XML(user_id)]]";
     let has_pfp = "[[=XML(has_pfp)]]"
-    let notify_upload_pfp_url = "[[=XML(notify_upload_pfp_url)]]"
-    let notify_delete_pfp_url = "[[=XML(notify_delete_pfp_url)]]"
-    let access_pfp_url = "[[=XML(access_pfp_url)]]"
 </script>
 <script src="js/profile.js"></script>
 [[end]]
