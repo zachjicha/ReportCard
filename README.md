@@ -1,3 +1,3 @@
 # ReportCard
 
-[reportcardapp.com](reportcardapp.com)
+[reportcardapp.com](www.reportcardapp.com)
