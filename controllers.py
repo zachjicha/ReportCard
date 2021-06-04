@@ -28,6 +28,7 @@ Warning: Fixtures MUST be declared with @action.uses({fixtures}) else your app w
 import os
 import json
 import uuid
+import datetime
 
 from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
@@ -35,9 +36,9 @@ from .common import db, session, T, cache, auth, logger, authenticated, unauthen
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
-#from nqgcs import NQGCS
+from nqgcs import NQGCS
 from .settings import APP_FOLDER
-#from .gcs_url import gcs_url
+from .gcs_url import gcs_url
 
 url_signer = URLSigner(session)
 
@@ -46,7 +47,7 @@ GCS_KEY_PATH = os.path.join(APP_FOLDER, 'private/gcs_keys.json')
 with open(GCS_KEY_PATH) as gcs_key_f:
     GCS_KEYS = json.load(gcs_key_f)
 
-#gcs = NQGCS(json_key_path=GCS_KEY_PATH)
+gcs = NQGCS(json_key_path=GCS_KEY_PATH)
 
 @action('index')
 @action.uses(db, auth, 'index.html')
@@ -100,6 +101,9 @@ def profile(user_id=None):
         user_id=user_id,
         profile_page_link=profile_page_link,
         has_pfp=has_pfp,
+        notify_upload_pfp_url=URL('notify_upload_pfp', signer=url_signer),
+        notify_delete_pfp_url=URL('notify_delete_pfp', signer=url_signer),
+        access_pfp_url=URL('access_pfp', signer=url_signer),
     )
 
 '''
@@ -524,7 +528,7 @@ def delete_like():
 ###########################################
 #            PFP ENDPOINTS                #
 ###########################################
-'''
+
 @action('access_pfp', method="POST")
 @action.uses(url_signer.verify(), db)
 def access_pfp():
@@ -615,4 +619,4 @@ def mark_possible_upload(file_path):
         owner=get_user_email(),
         file_path=file_path,
         confirmed=False,
-    )'''
+    )

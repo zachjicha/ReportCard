@@ -28,9 +28,8 @@ let init = (app) => {
         a.map((e) => {e._idx = k++;});
         return a;
     };
-    /*
-    app.upload_pfp = function (event) {
 
+    app.upload_pfp = function (event) {
         let input = event.target;
         let file = input.files[0];
         if (file) {
@@ -47,6 +46,7 @@ let init = (app) => {
             app.vue.uploading = true;
             let file_type = file.type;
             let file_name = file.name;
+            let file_size = file.size;
             // Requests the upload URL.
             axios.post(access_pfp_url, {
                 action: "PUT",
@@ -58,6 +58,7 @@ let init = (app) => {
                 let file_path = r.data.file_path;
                 // Uploads the file, using the low-level interface.
                 let req = new XMLHttpRequest();
+
                 // We listen to the load event = the file is uploaded, and we call upload_complete.
                 // That function will notify the server `of the location of the image.
                 req.addEventListener("load", function () {
@@ -72,6 +73,7 @@ let init = (app) => {
                 });
 
                 req.open("PUT", upload_url, true);
+                req.setRequestHeader("Access-Control-Allow-Origin", "*")
                 req.send(file);
             });
         }
@@ -82,6 +84,7 @@ let init = (app) => {
         axios.post(notify_upload_pfp_url, {
             file_name: file_name,
             file_path: file_path,
+
         }).then( function (r) {
             app.vue.uploading = false;
             // Reload so changes take effect
@@ -135,7 +138,7 @@ let init = (app) => {
             // Reload so changes take effect
             window.location.reload();
         })
-    }*/
+    }
 
     app.edit_stars_out = function () {
         app.vue.edit_stars_displayed = app.vue.edit_rating;
@@ -329,10 +332,10 @@ let init = (app) => {
         window.location.href = dest;
     }
 
-    // This contains all the methods.
+    // This contains all` the methods.
     app.methods = {
-        //upload_pfp: app.upload_pfp,
-        //delete_pfp: app.delete_pfp,
+        upload_pfp: app.upload_pfp,
+        delete_pfp: app.delete_pfp,
         edit_stars_out: app.edit_stars_out,
         edit_set_star: app.edit_set_star,
         edit_star_over: app.edit_star_over,
