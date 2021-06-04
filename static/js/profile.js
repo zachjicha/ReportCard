@@ -17,9 +17,9 @@ let init = (app) => {
         author_email: author_email,
         logged_in: logged_in,
         user_id: user_id,
-        has_pfp: has_pfp,
-        uploading: false,
-        deleting: false,
+        //has_pfp: has_pfp,
+        //uploading: false,
+        //deleting: false,
     };
 
     app.enumerate = (a) => {
