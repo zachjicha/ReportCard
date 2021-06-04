@@ -109,7 +109,8 @@
                 <button class="button" v-if="logged_in" @click="like_review(r._idx)">
                     <span class="icon-text">
                         <span class="icon">
-                            <i class="fa fa-thumbs-o-up"></i>
+                            <i class="fa fa-thumbs-up" v-if="r.liked == 1"></i>
+                            <i class="fa fa-thumbs-o-up" v-else></i>
                         </span>
                         <span>{{ r.likers }}</span>
                     </span>
@@ -126,7 +127,8 @@
                 <button class="button" v-if="logged_in" @click="dislike_review(r._idx)">
                     <span class="icon-text">
                         <span class="icon">
-                            <i class="fa fa-thumbs-o-down"></i>
+                            <i class="fa fa-thumbs-down" v-if="r.liked == 2"></i>
+                            <i class="fa fa-thumbs-o-down" v-else></i>
                         </span>
                         <span>{{ r.dislikers }}</span>
                     </span>
