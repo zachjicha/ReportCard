@@ -80,6 +80,12 @@ def profile(user_id=None):
         this_user_id = this_user_info.id
         profile_page_link = URL('profile', str(this_user_id))
 
+    pfp_info = db(db.pfp.owner == get_user_email()).select()
+    assert pfp_info is not None
+    has_pfp = False
+    if pfp_info:
+        has_pfp = True
+
     return dict(
         user_info=user_info,
         email=get_user_email(),
@@ -93,6 +99,7 @@ def profile(user_id=None):
         delete_like_url=URL('delete_like', signer=url_signer),
         user_id=user_id,
         profile_page_link=profile_page_link,
+        has_pfp=has_pfp,
     )
 
 '''
