@@ -379,7 +379,7 @@ def load_user_reviews():
     user_email = user_info.email
 
     reviews = db(db.reviews.user == user_email).select().as_list()
-    likes = db(db.likes.user_email == user_email).select().as_list()
+    likes = db(db.likes.user_email == get_user_email()).select().as_list()
     assert reviews is not None
     assert likes is not None
 
