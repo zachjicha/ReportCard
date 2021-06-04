@@ -51,13 +51,19 @@
                                         <textarea class="textarea" type="text" v-model="edit_text"></textarea>
                                     </div>
                                 </div>
+
+                                <div class="field">
+                                    <div class="control">
+                                        <button class="button is-success" @click="save_edit(r._idx, r.id)">
+                                            Save
+                                        </button>
+                                        <button class="button is-danger" @click="cancel_edit(r._idx)">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <button class="button is-success" @click="save_edit(r._idx, r.id)">
-                                Save
-                            </button>
-                            <button class="button is-danger" @click="cancel_edit(r._idx)">
-                                Cancel
-                            </button>
+
                         </div>
                         <div class="block" v-else>
                             {{ r.body }}
