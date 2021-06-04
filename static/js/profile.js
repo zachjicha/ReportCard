@@ -9,23 +9,17 @@ let init = (app) => {
 
     // This is the Vue data.
     app.data = {
-        // Complete as you see fit.
         reviews: [],
-        courses: [],
-        course_2_id: {},
-        add_mode: false,
         is_editing: false,
         edit_text: "",
         edit_stars_displayed: 0,
         edit_rating: 0,
-        stars_displayed: 0,
-        new_rating: 0,
-        new_course: "",
-        new_body: "",
-        author_name: author_name,
         author_email: author_email,
         logged_in: logged_in,
-        rating_string: rating_string,
+        user_id: user_id,
+        //has_pfp: has_pfp,
+        //uploading: false,
+        //deleting: false,
     };
 
     app.enumerate = (a) => {
@@ -34,44 +28,114 @@ let init = (app) => {
         a.map((e) => {e._idx = k++;});
         return a;
     };
+    /*
+    app.upload_pfp = function (event) {
 
-    app.calculate_rating = function () {
-        if(app.vue.reviews.length == 0) {
-            app.vue.rating_string = "No reviews yet...";
-        }
-        else {
-            let ratings = 0.0;
-            for(let i = 0; i < app.vue.reviews.length; i++) {
-                ratings += app.vue.reviews[i].rating;
+        let input = event.target;
+        let file = input.files[0];
+        if (file) {
+
+            // from https://roufid.com/javascript-check-file-image/
+            const acceptedImageTypes = ['image/jpeg', 'image/png'];
+
+            // If file is not image, fail
+            if(!acceptedImageTypes.includes(file.type)) {
+                alert("Only jpeg and png files are accepted");
+                return;
             }
 
-            let avg_rating = ratings / app.vue.reviews.length;
-            app.vue.rating_string = avg_rating.toFixed(1).toString() + "/5.0";
+            app.vue.uploading = true;
+            let file_type = file.type;
+            let file_name = file.name;
+            // Requests the upload URL.
+            axios.post(access_pfp_url, {
+                action: "PUT",
+                file_name: file_name,
+                file_type: file_type,
+            }).then ((r) => {
+                let upload_url = r.data.signed_url;
+                console.log(upload_url);
+                let file_path = r.data.file_path;
+                // Uploads the file, using the low-level interface.
+                let req = new XMLHttpRequest();
+                // We listen to the load event = the file is uploaded, and we call upload_complete.
+                // That function will notify the server `of the location of the image.
+                req.addEventListener("load", function () {
+                    app.upload_complete(file_name, file_path);
+                });
+
+                // Clean up on error
+                req.addEventListener("error", function () {
+                    alert("Image upload failed!");
+                    app.vue.uploading = false;
+                    return;
+                });
+
+                req.open("PUT", upload_url, true);
+                req.send(file);
+            });
         }
     }
 
-    app.set_add_mode = function (new_mode) {
-        app.vue.add_mode = new_mode;
-    };
-
-    app.reset_form = function () {
-        app.vue.new_body = "";
-        app.vue.new_rating = 0;
-        app.vue.new_course = "";
-        app.vue.stars_displayed = 0;
-    };
-
-    app.stars_out = function () {
-        app.vue.stars_displayed = app.vue.new_rating;
+    app.upload_complete = function (file_name, file_path) {
+        // We need to let the server know that the upload was complete;
+        axios.post(notify_upload_pfp_url, {
+            file_name: file_name,
+            file_path: file_path,
+        }).then( function (r) {
+            app.vue.uploading = false;
+            // Reload so changes take effect
+            //window.location.reload();
+        });
     }
 
-    app.set_star = function (star_idx) {
-        app.vue.new_rating = star_idx;
+    app.delete_pfp = function () {
+        if (!app.vue.delete_confirmation) {
+            // Ask for confirmation before deleting it.
+            app.vue.delete_confirmation = true;
+        } else {
+            // It's confirmed.
+            app.vue.delete_confirmation = false;
+            app.vue.deleting = true;
+            // Obtains the delete URL.
+            let file_path = app.vue.file_path;
+            axios.post(access_pfp_url, {
+                action: "DELETE",
+                file_path: file_path,
+            }).then(function (r) {
+                let delete_url = r.data.signed_url;
+                if (delete_url) {
+                    // Performs the deletion request.
+                    let req = new XMLHttpRequest();
+                    req.addEventListener("load", function () {
+                        app.deletion_complete(file_path);
+                    });
+
+                    // Clean up on error
+                    req.addEventListener("error", function () {
+                        alert("Image delete failed!");
+                        app.vue.deleting = false;
+                        return;
+                    });
+
+                    req.open("DELETE", delete_url);
+                    req.send();
+                }
+            });
+        }
     }
 
-    app.star_over = function (star_idx) {
-        app.vue.stars_displayed = star_idx;
-    }
+    app.deletion_complete = function (file_path) {
+        // We need to notify the server that the file has been deleted on GCS.
+        axios.post(notify_delete_pfp_url, {
+            file_path: file_path,
+        }).then (function (r) {
+            // Poof, no more file.
+            app.vue.deleting =  false;
+            // Reload so changes take effect
+            window.location.reload();
+        })
+    }*/
 
     app.edit_stars_out = function () {
         app.vue.edit_stars_displayed = app.vue.edit_rating;
@@ -119,48 +183,6 @@ let init = (app) => {
         app.vue.edit_text = "";
         app.vue.edit_stars_displayed = 0;
     }
-
-    app.add_review = function () {
-        let body = app.vue.new_body;
-        axios.post(
-            add_review_url,
-            {
-                course: app.vue.course_2_id[app.vue.new_course],
-                instructor: instr_id,
-                body: body,
-                rating: parseFloat(app.vue.new_rating),
-            }
-        ).then(function (response) {
-            app.vue.reviews.push({
-                id: response.data.id,
-                body: body,
-                course: app.vue.course_2_id[app.vue.new_course],
-                course_name: response.data.course_name,
-                instructor: instr_id,
-                rating: parseFloat(app.vue.new_rating),
-                liked: 0,
-                _like_id: -1,
-                likers: 0,
-                dislikers: 0,
-                hover: false,
-                user: author_email,
-                user_id: author_id,
-                user_name: author_name,
-                is_editing: false,
-            });
-            app.enumerate(app.vue.reviews);
-            app.calculate_rating();
-            app.reset_form();
-            app.set_add_mode(false);
-        });
-
-
-    };
-
-    app.cancel_review = function () {
-        app.vue.new_body = ""
-        app.vue.add_mode = false;
-    };
 
     app.delete_review = function (rev_idx) {
         let id = app.vue.reviews[rev_idx].id;
@@ -297,12 +319,8 @@ let init = (app) => {
         }
     }
 
-    app.set_hover = function (post_idx, new_state) {
-        app.vue.reviews[post_idx].hover = new_state;
-    }
-
-    app.to_profile = function (rev_idx) {
-        let dest = '../profile/' + app.vue.reviews[rev_idx].user_id.toString();
+    app.to_instr = function (rev_idx) {
+        let dest = '../instructor/' + app.vue.reviews[rev_idx].instructor.toString();
         window.location.href = dest;
     }
 
@@ -313,41 +331,33 @@ let init = (app) => {
 
     // This contains all the methods.
     app.methods = {
-        // Complete as you see fit.
-        set_add_mode: app.set_add_mode,
-        add_review: app.add_review,
-        cancel_review: app.cancel_review,
-        delete_review: app.delete_review,
-        like_review: app.like_review,
-        dislike_review: app.dislike_review,
-        set_hover: app.set_hover,
-        star_over: app.star_over,
-        stars_out: app.stars_out,
-        set_star: app.set_star,
+        //upload_pfp: app.upload_pfp,
+        //delete_pfp: app.delete_pfp,
+        edit_stars_out: app.edit_stars_out,
+        edit_set_star: app.edit_set_star,
+        edit_star_over: app.edit_star_over,
         start_edit: app.start_edit,
         save_edit: app.save_edit,
         cancel_edit: app.cancel_edit,
-        edit_star_over: app.edit_star_over,
-        edit_stars_out: app.edit_stars_out,
-        edit_set_star: app.edit_set_star,
-        to_profile: app.to_profile,
+        delete_review: app.delete_review,
+        like_review: app.like_review,
+        dislike_review: app.dislike_review,
+        to_instr: app.to_instr,
         to_course: app.to_course,
     };
 
     // This creates the Vue instance.
     app.vue = new Vue({
-        el: "#instr-page",
+        el: "#profile-page",
         data: app.data,
         methods: app.methods
     });
 
     // And this initializes it.
     app.init = () => {
-        // Put here any initialization code.
-        // Typically this is a server GET call to load the data.
         axios.post(
-            load_instructor_reviews_url,
-            {instr_id: instr_id},
+            load_user_reviews_url,
+            {user_id: user_id}
         ).then(function (response) {
             let reviews = response.data.reviews;
             app.enumerate(reviews);
@@ -367,10 +377,7 @@ let init = (app) => {
                 }
             }
 
-            app.vue.courses = response.data.courses;
-            app.vue.course_2_id = response.data.course_2_id;
             app.vue.reviews = reviews;
-            app.calculate_rating();
         });
     };
 

@@ -10,7 +10,7 @@
 
     <div class="section">
         <figure>
-            <img src="https://raw.githubusercontent.com/zachjicha/ReportCard/master/static/logo_trimmed.png?token=AP2ENE63IXDKIUUA4IAZR2DAXGVZ6"/>
+            <img src="[[=URL('static', 'logo_trimmed.png')]]"/>
         </figure>
 
         <div class="section has-text-centered">
@@ -62,7 +62,7 @@
                             </button>
                         </div>
                     </div>
-                    <p class="help is-danger" v-if="!is_valid">
+                    <p class="help is-danger" v-if="!instr_is_valid">
                         Please enter a valid instructor
                     </p>
                 </div>

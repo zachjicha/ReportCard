@@ -35,7 +35,7 @@
 
           [[if globals().get('user'):]]
             <div class="navbar-item">
-              <p>[[=globals().get('user').get('email')]]</p>
+              <a href="[[=profile_page_link]]">[[=globals().get('user').get('email')]]</a>
             </div>
           [[pass]]
           <div class="navbar-item">

@@ -22,7 +22,8 @@ let init = (app) => {
         new_rating: 0,
         new_instr: "",
         new_body: "",
-        author: author,
+        author_email: author_email,
+        author_name: author_name,
         logged_in: logged_in,
         rating_string: rating_string,
     };
@@ -143,7 +144,9 @@ let init = (app) => {
                 likers: 0,
                 dislikers: 0,
                 hover: false,
-                user: author,
+                user: author_email,
+                user_name: author_name,
+                user_id: author_id,
                 is_editing: false,
             });
             app.enumerate(app.vue.reviews);
@@ -299,6 +302,16 @@ let init = (app) => {
         app.vue.reviews[post_idx].hover = new_state;
     }
 
+    app.to_profile = function (rev_idx) {
+        let dest = '../profile/' + app.vue.reviews[rev_idx].user_id.toString();
+        window.location.href = dest;
+    }
+
+    app.to_instr = function (rev_idx) {
+        let dest = '../instructor/' + app.vue.reviews[rev_idx].instructor.toString();
+        window.location.href = dest;
+    }
+
     // This contains all the methods.
     app.methods = {
         // Complete as you see fit.
@@ -318,6 +331,8 @@ let init = (app) => {
         edit_star_over: app.edit_star_over,
         edit_stars_out: app.edit_stars_out,
         edit_set_star: app.edit_set_star,
+        to_profile: app.to_profile,
+        to_instr: app.to_instr,
     };
 
     // This creates the Vue instance.

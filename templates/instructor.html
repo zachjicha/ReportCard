@@ -67,11 +67,11 @@
 
         <hr>
 
-        <div class="box" v-for="r in reviews">
+        <div class="box" v-for="r in reviews.slice().reverse()">
             <div class="block">
-                <span><b>Course: </b> {{ r.course_name }}</span><br>
+                <span><b>Course: </b> <a @click="to_course(r._idx)">{{ r.course_name }}</a></span><br>
                 <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span><br>
-                <span><b>User: </b> {{ r.user }}</span>
+                <span><b>User: </b> <a @click="to_profile(r._idx)">{{ r.user_name }}</a></span>
 
             </div>
 
@@ -141,13 +141,13 @@
                     </span>
                 </button>
 
-                <button class="button is-warning" v-if="r.user == author" @click="start_edit(r._idx)">
+                <button class="button is-warning" v-if="r.user == author_email" @click="start_edit(r._idx)">
                     <span class="icon">
                         <i class="fa fa-pencil"></i>
                     </span>
                 </button>
 
-                <button class="button is-danger" v-if="r.user == author" @click="delete_review(r._idx)">
+                <button class="button is-danger" v-if="r.user == author_email" @click="delete_review(r._idx)">
                     <span class="icon">
                         <i class="fa fa-trash"></i>
                     </span>
@@ -167,8 +167,10 @@
     let add_like_url = "[[=XML(add_like_url)]]";
     let flip_like_url = "[[=XML(flip_like_url)]]";
     let delete_like_url = "[[=XML(delete_like_url)]]";
-    let edit_review_url = "[[=XML(edit_review_url)]]"
-    let author = "[[=XML(author)]]";
+    let edit_review_url = "[[=XML(edit_review_url)]]";
+    let author_email = "[[=XML(author_email)]]";
+    let author_name = "[[=XML(author_name)]]";
+    let author_id = "[[=XML(author_id)]]";
     let instr_id = "[[=XML(instr_id)]]";
     let logged_in = ("[[=XML(logged_in)]]" === "True");
     let rating_string = "[[=XML(rating_string)]]";
