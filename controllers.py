@@ -35,9 +35,9 @@ from .common import db, session, T, cache, auth, logger, authenticated, unauthen
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
-from nqgcs import NQGCS
+#from nqgcs import NQGCS
 from .settings import APP_FOLDER
-from .gcs_url import gcs_url
+#from .gcs_url import gcs_url
 
 url_signer = URLSigner(session)
 
@@ -46,7 +46,7 @@ GCS_KEY_PATH = os.path.join(APP_FOLDER, 'private/gcs_keys.json')
 with open(GCS_KEY_PATH) as gcs_key_f:
     GCS_KEYS = json.load(gcs_key_f)
 
-gcs = NQGCS(json_key_path=GCS_KEY_PATH)
+#gcs = NQGCS(json_key_path=GCS_KEY_PATH)
 
 @action('index')
 @action.uses(db, auth, 'index.html')
