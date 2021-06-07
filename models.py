@@ -13,7 +13,6 @@ def get_user_email():
 def get_time():
     return datetime.datetime.utcnow()
 
-
 ### Define your table below
 #
 # db.define_table('thing', Field('name'))
@@ -55,14 +54,6 @@ db.define_table(
     Field('user_email', requires=IS_NOT_EMPTY()),
     Field('review', 'reference reviews', requires=IS_NOT_EMPTY()),
 )
-'''
-db.define_table(
-    'pfp',
-    Field('owner', default=get_user_email()),
-    Field('file_name'),
-    Field('file_path'),
-    Field('confirmed', 'boolean', default=False),
-)'''
 
 db.schools.id.readable     = db.schools.id.writable     = False
 db.courses.id.readable     = db.courses.id.writable     = False
