@@ -31,11 +31,15 @@ let init = (app) => {
 
     app.enumerate = (reviews) => {
         // This adds an _idx field to each element of the array.
+
+        // If reviews exist
         if(reviews.length > 0) {
+            // Sort to get back into chronological order
             reviews.sort((r1, r2) => {return r1.id - r2.id})
             let maxIndex = 0;
             let maxVal = reviews[0].likers;
 
+            // Find review with most likes
             for(let i = 1; i < reviews.length; i++) {
                 if(reviews[i].likers > maxVal) {
                     maxVal = reviews[i].likers;
@@ -43,6 +47,7 @@ let init = (app) => {
                 }
             }
 
+            // There is no most liked post if all have no likes
             if(maxVal == 0) {
                 app.vue.mostLikedExists = false;
             }
@@ -50,8 +55,8 @@ let init = (app) => {
                 app.vue.mostLikedExists = true;
             }
 
+            // Add mostliked field to review
             let mostLikedFound = false;
-
             for(let i = 0; i < reviews.length; i++) {
                 if(i == maxIndex && app.vue.mostLikedExists && !mostLikedFound) {
                     reviews[i].mostLiked = true;
@@ -62,8 +67,8 @@ let init = (app) => {
                 }
             }
 
+            // Reorder so most liked is first
             let reviewsReordered = []
-
             for(let i = 0; i < reviews.length; i++) {
                 if(i == maxIndex && app.vue.mostLikedExists) {
                     continue;
@@ -79,12 +84,15 @@ let init = (app) => {
             }
         }
 
+        // Same old enumerate
         let k = 0;
         reviews.map((e) => {e._idx = k++;});
         return reviews;
     };
 
+    // Calculate review for instructor
     app.calculate_rating = function () {
+        // Simple average
         if(app.vue.reviews.length == 0) {
             app.vue.rating_string = "No reviews yet...";
         }
@@ -99,10 +107,12 @@ let init = (app) => {
         }
     }
 
+    // Flag for add or not add new review page elements
     app.set_add_mode = function (new_mode) {
         app.vue.add_mode = new_mode;
     };
 
+    // Reset add review form
     app.reset_form = function () {
         app.vue.new_body = "";
         app.vue.new_rating = 0;
@@ -110,6 +120,7 @@ let init = (app) => {
         app.vue.stars_displayed = 0;
     };
 
+    // Stars functions for adding review
     app.stars_out = function () {
         app.vue.stars_displayed = app.vue.new_rating;
     }
@@ -122,6 +133,7 @@ let init = (app) => {
         app.vue.stars_displayed = star_idx;
     }
 
+    // Stars function for in place editing
     app.edit_stars_out = function () {
         app.vue.edit_stars_displayed = app.vue.edit_rating;
     }
@@ -134,6 +146,7 @@ let init = (app) => {
         app.vue.edit_stars_displayed = star_idx;
     }
 
+    // Start in place edit
     app.start_edit = function (rev_idx) {
         if(!app.vue.is_editing) {
             app.vue.reviews[rev_idx].is_editing = true;
@@ -144,6 +157,7 @@ let init = (app) => {
         }
     }
 
+    // Save in place edit
     app.save_edit = function (rev_idx, rev_id) {
         axios.post(
             edit_review_url,
@@ -162,6 +176,7 @@ let init = (app) => {
         });
     }
 
+    // Cancel in place edit
     app.cancel_edit = function (rev_idx) {
         app.vue.reviews[rev_idx].is_editing = false;
         app.vue.is_editing = false;
@@ -169,7 +184,9 @@ let init = (app) => {
         app.vue.edit_stars_displayed = 0;
     }
 
+    // Add new review to db and page
     app.add_review = function () {
+        // Send request to add, once confirmed add to page
         let body = app.vue.new_body;
         axios.post(
             add_review_url,
@@ -206,12 +223,15 @@ let init = (app) => {
 
     };
 
+    // Cancel new review
     app.cancel_review = function () {
         app.vue.new_body = ""
         app.vue.add_mode = false;
     };
 
+    // Delete review
     app.delete_review = function (rev_idx) {
+        // Send request  to delete, once confirmed remove from page
         let id = app.vue.reviews[rev_idx].id;
         axios.post(
             delete_review_url,
@@ -228,6 +248,7 @@ let init = (app) => {
         });
     }
 
+    // Like a review
     app.like_review = function (review_idx) {
         let review = app.vue.reviews[review_idx];
 
@@ -290,6 +311,7 @@ let init = (app) => {
         }
     }
 
+    // Dislike a review
     app.dislike_review = function (review_idx) {
         let review = app.vue.reviews[review_idx];
 
@@ -356,11 +378,13 @@ let init = (app) => {
         app.vue.reviews[post_idx].hover = new_state;
     }
 
+    // Navigate to reviewer profile
     app.to_profile = function (rev_idx) {
         let dest = '../profile/' + app.vue.reviews[rev_idx].user_id.toString();
         window.location.href = dest;
     }
 
+    // Navigate to reviewed course page
     app.to_course = function (rev_idx) {
         let dest = '../course/' + app.vue.reviews[rev_idx].course.toString();
         window.location.href = dest;
@@ -407,6 +431,7 @@ let init = (app) => {
             let reviews = response.data.reviews;
             let likes = response.data.likes;
 
+            // Add all needed fields to reviews
             for(let i = 0; i < reviews.length; i++) {
                 reviews[i].hover = false;
                 reviews[i].liked = 0;
