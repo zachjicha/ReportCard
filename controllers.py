@@ -51,6 +51,7 @@ with open(GCS_KEY_PATH) as gcs_key_f:
 @action('index')
 @action.uses(db, auth, 'index.html')
 def index():
+    # Always add link to profile page for user if logged in for layout.html
     profile_page_link = ""
     if get_user_email() is not None:
         this_user_info = db(db.auth_user.email == get_user_email()).select().first()
@@ -70,9 +71,11 @@ def profile(user_id=None):
     assert user_id is not None
     logged_in = True if get_user_email() is not None else False
 
+    # Get info related to user from profile page
     user_info = db(db.auth_user.id == user_id).select().first()
     assert user_info is not None
 
+    # Always add link to profile page for user if logged in for layout.html
     profile_page_link = ""
     if get_user_email() is not None:
         this_user_info = db(db.auth_user.email == get_user_email()).select().first()
@@ -95,22 +98,6 @@ def profile(user_id=None):
         profile_page_link=profile_page_link,
     )
 
-'''
-@action('profile/<user_id:int>')
-@action.uses(db, session, 'profile.html')
-def profile(user_id=None):
-    assert user_id is not None
-
-    return dict(
-        user=db(db.auth_user.id == user_id).select().first(),
-        email=get_user_email(),
-        has_pfp=False,
-        notify_upload_pfp_url=URL('notify_upload_pfp', signer=url_signer),
-        notify_delete_pfp_url=URL('notify_delete_pfp', signer=url_signer),
-        access_pfp_url=URL('access_pfp', signer=url_signer),
-        pfp_url="https://cdn.geekwire.com/wp-content/uploads/2018/01/L10309441.jpg",
-    )'''
-
 @action('add_course', method=["GET", "POST"])
 @action.uses(db, session, auth.user, url_signer.verify(), 'add_course.html')
 def add_course():
@@ -119,6 +106,7 @@ def add_course():
         # Redirect back to index
         redirect(URL('index'))
     else:
+        # Always add link to profile page for user if logged in for layout.html
         profile_page_link = ""
         if get_user_email() is not None:
             this_user_info = db(db.auth_user.email == get_user_email()).select().first()
@@ -136,6 +124,7 @@ def add_instructor():
         # Redirect back to index
         redirect(URL('index'))
     else:
+        # Always add link to profile page for user if logged in for layout.html
         profile_page_link = ""
         if get_user_email() is not None:
             this_user_info = db(db.auth_user.email == get_user_email()).select().first()
@@ -150,6 +139,7 @@ def add_instructor():
 def course(course_id=None):
     assert course_id is not None
 
+    # Get course info and reviews related to course
     course_info = db(db.courses.id == course_id).select().first()
     reviews = db(db.reviews.course == course_id).select().as_list()
 
@@ -161,17 +151,21 @@ def course(course_id=None):
     ratings = []
     school = db(db.schools.id == course_info.school).select().first().name
 
+    # Collect all ratings for calculation
+    # add instructor names to reviews
     for review in reviews:
         ratings.append(review["rating"])
         instructor = db(db.instructors.id == review["instructor"]).select().first()
         review["instr_name"] = instructor.first_name + " " + instructor.last_name
 
+    # Calculate rating
     if ratings:
         avg_rating = sum(ratings)/len(ratings)
         rating_string = "{:.1f}/5.0".format(avg_rating)
     else:
         rating_string = "No ratings yet..."
 
+    # Always add link to profile page for user if logged in for layout.html
     profile_page_link = ""
     if get_user_email() is not None:
         this_user_info = db(db.auth_user.email == get_user_email()).select().first()
@@ -179,6 +173,7 @@ def course(course_id=None):
         this_user_id = this_user_info.id
         profile_page_link = URL('profile', str(this_user_id))
 
+    # Get author (user logged in)
     author_name = ""
     author_id = -1
     if logged_in:
@@ -212,6 +207,7 @@ def course(course_id=None):
 def course(instr_id=None):
     assert instr_id is not None
 
+    # Get instructor info and related reviews
     instr_info = db(db.instructors.id == instr_id).select().first()
     reviews = db(db.reviews.instructor == instr_id).select().as_list()
 
@@ -223,17 +219,20 @@ def course(instr_id=None):
     ratings = []
     school = db(db.schools.id == instr_info.school).select().first().name
 
+    # Collect all ratings and add course name to reviews
     for review in reviews:
         ratings.append(review["rating"])
         course = db(db.courses.id == review["course"]).select().first()
         review["course_name"] = course.name
 
+    # Calculate rating
     if ratings:
         avg_rating = sum(ratings)/len(ratings)
         rating_string = "{:.1f}/5.0".format(avg_rating)
     else:
         rating_string = "No ratings yet..."
 
+    # Always add link to profile page for user if logged in for layout.html
     profile_page_link = ""
     if get_user_email() is not None:
         this_user_info = db(db.auth_user.email == get_user_email()).select().first()
@@ -241,6 +240,7 @@ def course(instr_id=None):
         this_user_id = this_user_info.id
         profile_page_link = URL('profile', str(this_user_id))
 
+    # Get author (logged in user)
     author_name = ""
     author_id = -1
     if logged_in:
@@ -285,13 +285,16 @@ def load_instructor_reviews():
     school_id = instr_info.school
     courses_info = db(db.courses.school == school_id).select()
     assert courses_info is not None
+    # List of courses reviewed
     courses = []
+    # Convert course name to  course id
     course_2_id = {}
 
     for c in courses_info:
         courses.append(c.name)
         course_2_id[c.name] = c.id
 
+    # Extract reviews and likes for instructor
     reviews = db(db.reviews.instructor == instr_id).select().as_list()
     likes = db(db.likes.user_email == get_user_email()).select().as_list()
     assert reviews is not None
@@ -333,7 +336,9 @@ def load_course_reviews():
     instr_info = db(db.instructors.school == school_id).select()
     assert instr_info is not None
 
+    # List of all instructors reviews
     instructors = []
+    # Convert instructor name to instructor id
     instr_2_id = {}
 
     for i in instr_info:
@@ -341,6 +346,7 @@ def load_course_reviews():
         instructors.append(name)
         instr_2_id[name] = i.id
 
+    # Extract course reviews and likes
     reviews = db(db.reviews.course == course_id).select().as_list()
     likes = db(db.likes.user_email == get_user_email()).select().as_list()
     assert reviews is not None
@@ -378,6 +384,7 @@ def load_user_reviews():
     assert user_info is not None
     user_email = user_info.email
 
+    # Get all reviews for the user whos profile is displayed and get likes for author
     reviews = db(db.reviews.user == user_email).select().as_list()
     likes = db(db.likes.user_email == get_user_email()).select().as_list()
     assert reviews is not None
@@ -407,6 +414,7 @@ def load_user_reviews():
 @action('load_everything', method="POST")
 @action.uses(url_signer.verify(), db)
 def load_everything():
+    # Get all courses and instructors names and conversion dictionaries
     courses_info = db(db.courses).select()
     instrs_info = db(db.instructors).select()
 
@@ -437,12 +445,14 @@ def load_everything():
 @action('add_review', method="POST")
 @action.uses(url_signer.verify(), db)
 def add_review():
+    # Get course info and add to db
     course = request.json.get('course')
     instructor = request.json.get('instructor')
     body = request.json.get('body')
     rating = request.json.get('rating')
     user = get_user_email()
 
+    # Fail if not logged in (shouldn't be possible)
     if get_user_email() is None:
         return dict(fail=True)
 
@@ -461,12 +471,13 @@ def add_review():
 
     course_description = db(db.courses.id == course).select().first()
     assert course_description is not None
-
+    # Give useful info back to page
     return dict(id=new_id, fail=False, course_name=course_description.name)
 
 @action('edit_review', method="POST")
 @action.uses(url_signer.verify(), db)
 def edit_review():
+    # Change review details
     review_id = request.json.get('id')
     new_body = request.json.get('body')
     new_rating = request.json.get('rating')
@@ -480,6 +491,7 @@ def edit_review():
 @action('delete_review', method="POST")
 @action.uses(url_signer.verify(), db)
 def delete_review():
+    # Delete review from db
     review_id = request.json.get('id')
     assert review_id is not None
     db(db.reviews.id == review_id).delete()
@@ -488,6 +500,7 @@ def delete_review():
 @action('add_like', method="POST")
 @action.uses(url_signer.verify(), db)
 def add_like():
+    # Add like to db
     new_id = db.likes.insert(
         is_like=request.json.get('is_like'),
         review=request.json.get('review'),
@@ -498,6 +511,7 @@ def add_like():
 @action('flip_like', method="POST")
 @action.uses(url_signer.verify(), db)
 def flip_like():
+    # Change like to dislike and vice versa in db
     like_id = request.json.get('id')
     assert like_id is not None
     new_val = request.json.get('is_like')
@@ -508,104 +522,8 @@ def flip_like():
 @action('delete_like', method="POST")
 @action.uses(url_signer.verify(), db)
 def delete_like():
+    # Delete a like from db
     like_id = request.json.get('id')
     assert like_id is not None
     db(db.likes.id == like_id).delete()
     return "ok"
-
-
-###########################################
-#            PFP ENDPOINTS                #
-###########################################
-'''
-@action('access_pfp', method="POST")
-@action.uses(url_signer.verify(), db)
-def access_pfp():
-    """Returns the URL to do download / upload / delete for GCS."""
-    verb = request.json.get("action")
-    if verb == "PUT":
-        mimetype = request.json.get("mimetype", "")
-        file_name = request.json.get("file_name")
-        extension = os.path.splitext(file_name)[1]
-        # Use + and not join for Windows, thanks Blayke Larue
-        file_path = BUCKET + "/" + str(uuid.uuid1()) + extension
-        # Marks that the path may be used to upload a file.
-        mark_possible_upload(file_path)
-        upload_url = gcs_url(GCS_KEYS, file_path, verb='PUT',
-                             content_type=mimetype)
-        return dict(
-            signed_url=upload_url,
-            file_path=file_path
-        )
-    elif verb in ["GET", "DELETE"]:
-        file_path = request.json.get("file_path")
-        if file_path is not None:
-            # We check that the file_path belongs to the user.
-            r = db(db.pfp.file_path == file_path).select().first()
-            if r is not None and r.owner == get_user_email():
-                # Yes, we can let the deletion happen.
-                delete_url = gcs_url(GCS_KEYS, file_path, verb='DELETE')
-                return dict(signed_url=delete_url)
-        # Otherwise, we return no URL, so we don't authorize the deletion.
-        return dict(signer_url=None)
-
-@action('notify_upload_pfp', method="POST")
-@action.uses(url_signer.verify(), db)
-def notify_upload_pfp():
-    """We get the notification that the file has been uploaded."""
-    file_name = request.json.get("file_name")
-    file_path = request.json.get("file_path")
-    # Deletes any previous file.
-    rows = db(db.pfp.owner == get_user_email()).select()
-    for r in rows:
-        if r.file_path != file_path:
-            delete_path(r.file_path)
-    # Marks the upload as confirmed.
-    db.pfp.update_or_insert(
-        ((db.pfp.owner == get_user_email()) &
-         (db.pfp.file_path == file_path)),
-        owner=get_user_email(),
-        file_path=file_path,
-        file_name=file_name,
-        confirmed=True,
-    )
-    # Returns the file information.
-    return dict(
-        download_url=gcs_url(GCS_KEYS, file_path, verb='GET')
-    )
-
-@action('notify_delete_pfp', method="POST")
-@action.uses(url_signer.verify(), db)
-def notify_delete_pfp():
-    file_path = request.json.get("file_path")
-    # We check that the owner matches to prevent DDOS.
-    db((db.pfp.owner == get_user_email()) &
-       (db.pfp.file_path == file_path)).delete()
-    return dict()
-
-def delete_path(file_path):
-    """Deletes a file given the path, without giving error if the file
-    is missing."""
-    try:
-        bucket, id = os.path.split(file_path)
-        gcs.delete(bucket[1:], id)
-    except:
-        # Ignores errors due to missing file.
-        pass
-
-def delete_previous_uploads():
-    """Deletes all previous uploads for a user, to be ready to upload a new file."""
-    previous = db(db.pfp.owner == get_user_email()).select()
-    for p in previous:
-        # There should be only one, but let's delete them all.
-        delete_path(p.file_path)
-    db(db.pfp.owner == get_user_email()).delete()
-
-def mark_possible_upload(file_path):
-    """Marks that a file might be uploaded next."""
-    delete_previous_uploads()
-    db.pfp.insert(
-        owner=get_user_email(),
-        file_path=file_path,
-        confirmed=False,
-    )'''
