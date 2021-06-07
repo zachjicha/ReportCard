@@ -25,19 +25,23 @@ let init = (app) => {
         return a;
     };
 
+    // Check if input is a real course
     app.check_course_validity = function () {
         app.vue.course_is_valid = app.vue.course_query in app.vue.course_2_id;
     }
 
+    // Check if input is a real instructor
     app.check_instr_validity = function () {
         app.vue.instr_is_valid = app.vue.instr_query in app.vue.instr_2_id;
     }
 
+    // Navigate to selected course page
     app.course_go = function() {
         let dest = '../course/' + app.vue.course_2_id[app.vue.course_query].toString();
         window.location.href = dest;
     }
 
+    // Navigate to selected instructor page
     app.instr_go = function() {
         let dest = '../instructor/' + app.vue.instr_2_id[app.vue.instr_query].toString();
         window.location.href = dest;
