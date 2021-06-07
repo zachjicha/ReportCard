@@ -9,10 +9,12 @@
 <div class="container" id="course-page" v-cloak>
     <div class="section">
 
+        <!-- Course info --->
         <h1 class="title">[[=course.name]]</h1>
         <h2 class="subtitle">[[=course.description]]</h2><br>
         <h1 class="title">{{ rating_string }}</h1>
 
+        <!-- Add new rating --->
         <div v-if="!add_mode">
             <button class="button is-success" v-if="logged_in" @click="set_add_mode(true)">
                 <span>Rate this course</span>
@@ -62,6 +64,7 @@
         </div>
     </div>
 
+    <!-- List of reviews --->
     <div class="section">
         <h1 class="title">Reviews</h1>
 
