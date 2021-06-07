@@ -10,7 +10,8 @@
     <div class="section">
 
         <h1 class="title">[[=course.name]]</h1>
-        <h2 class="subtitle">[[=course.description]]<br>{{ rating_string }}</h2>
+        <h2 class="subtitle">[[=course.description]]</h2><br>
+        <h1 class="title">{{ rating_string }}</h1>
 
         <div v-if="!add_mode">
             <button class="button is-success" v-if="logged_in" @click="set_add_mode(true)">
@@ -71,7 +72,6 @@
                 <span><b>Instructor: </b> <a @click="to_instr(r._idx)">{{ r.instr_name }}</a></span><br>
                 <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span><br>
                 <span><b>User: </b> <a @click="to_profile(r._idx)">{{ r.user_name }}</a></span>
-
             </div>
 
             <div class="block" v-if="r.is_editing">

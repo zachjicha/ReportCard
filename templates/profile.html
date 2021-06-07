@@ -30,7 +30,7 @@
                             <span><b>Course: </b> <a @click="to_course(r._idx)">{{ r.course_name }}</a></span><br>
                             <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span><br>
                         </div>
-                        
+
                         <div class="block" v-if="r.is_editing">
                             <div class="form">
                                 <div class="field">

@@ -10,7 +10,8 @@
     <div class="section">
 
         <h1 class="title">[[=instr.first_name]] [[=instr.last_name]]</h1>
-        <h2 class="subtitle">An instructor in the <b>[[=instr.department]]</b> department at <b>[[=school]]</b><br>{{ rating_string }}</h2>
+        <h2 class="subtitle">An instructor in the <b>[[=instr.department]]</b> department at <b>[[=school]]</b></h2><br>
+        <h1 class="title">{{ rating_string }}</h1>
 
         <div v-if="!add_mode">
             <button class="button is-success" v-if="logged_in" @click="set_add_mode(true)">
@@ -62,10 +63,7 @@
         </div>
     </div>
 
-
-
     <div class="section">
-
         <div class="block">
             <h1 class="title">Reviews</h1>
 
