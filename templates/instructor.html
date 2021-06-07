@@ -71,7 +71,7 @@
 
             <hr>
 
-            <div class="box" v-for="r in reviews.slice().reverse()">
+            <div class="box has-background-light" v-for="r in reviews.slice().reverse()">
                 <div class="block">
                     <span><b>Course: </b> <a @click="to_course(r._idx)">{{ r.course_name }}</a></span><br>
                     <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span><br>
@@ -116,7 +116,7 @@
                 </div>
 
                 <div class="block">
-                    <button class="button" v-if="logged_in" @click="like_review(r._idx)">
+                    <button class="button is-info" v-if="logged_in" @click="like_review(r._idx)">
                         <span class="icon-text">
                             <span class="icon">
                                 <i class="fa fa-thumbs-up" v-if="r.liked == 1"></i>
@@ -125,7 +125,7 @@
                             <span>{{ r.likers }}</span>
                         </span>
                     </button>
-                    <button class="button" v-else disabled>
+                    <button class="button is-info" v-else disabled>
                         <span class="icon-text">
                             <span class="icon">
                                 <i class="fa fa-thumbs-o-up"></i>
@@ -134,7 +134,7 @@
                         </span>
                     </button>
 
-                    <button class="button" v-if="logged_in" @click="dislike_review(r._idx)">
+                    <button class="button is-info" v-if="logged_in" @click="dislike_review(r._idx)">
                         <span class="icon-text">
                             <span class="icon">
                                 <i class="fa fa-thumbs-down" v-if="r.liked == 2"></i>
@@ -143,7 +143,7 @@
                             <span>{{ r.dislikers }}</span>
                         </span>
                     </button>
-                    <button class="button" v-else disabled>
+                    <button class="button is-info" v-else disabled>
                         <span class="icon-text">
                             <span class="icon">
                                 <i class="fa fa-thumbs-o-down"></i>
@@ -163,9 +163,11 @@
                             <i class="fa fa-trash"></i>
                         </span>
                     </button>
+
                     <span class="tag is-info is-large is-pulled-right" v-if="r.mostLiked">
                         😤 MOST HELPFUL REVIEW 😤
                     </span>
+
                 </div>
             </div>
         </div>

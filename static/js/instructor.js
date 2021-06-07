@@ -43,8 +43,6 @@ let init = (app) => {
                 }
             }
 
-            console.log(maxIndex)
-
             if(maxVal == 0) {
                 app.vue.mostLikedExists = false;
             }
@@ -80,7 +78,7 @@ let init = (app) => {
                 reviews.splice(maxIndex, 1);
             }
         }
-        console.log(reviews)
+
         let k = 0;
         reviews.map((e) => {e._idx = k++;});
         return reviews;
@@ -161,7 +159,6 @@ let init = (app) => {
             app.vue.is_editing = false;
             app.vue.edit_text = "";
             app.calculate_rating();
-            app.vue.reviews = app.enumerate(app.vue.reviews);
         });
     }
 
