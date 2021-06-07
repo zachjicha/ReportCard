@@ -9,10 +9,12 @@
 <div class="container" id="instr-page" v-cloak>
     <div class="section">
 
+        <!-- Instructor info --->
         <h1 class="title">[[=instr.first_name]] [[=instr.last_name]]</h1>
         <h2 class="subtitle">An instructor in the <b>[[=instr.department]]</b> department at <b>[[=school]]</b></h2><br>
         <h1 class="title">{{ rating_string }}</h1>
 
+        <!-- Add new review --->
         <div v-if="!add_mode">
             <button class="button is-success" v-if="logged_in" @click="set_add_mode(true)">
                 <span>Rate this instructor</span>
@@ -63,6 +65,7 @@
         </div>
     </div>
 
+    <!-- Review Section --->
     <div class="section">
         <div class="block">
             <h1 class="title">Reviews</h1>
@@ -74,7 +77,6 @@
                     <span><b>Course: </b> <a @click="to_course(r._idx)">{{ r.course_name }}</a></span><br>
                     <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span><br>
                     <span><b>User: </b> <a @click="to_profile(r._idx)">{{ r.user_name }}</a></span>
-
                 </div>
 
                 <div class="block" v-if="r.is_editing">
@@ -107,7 +109,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="block" v-else>
                     {{ r.body }}
