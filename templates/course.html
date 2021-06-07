@@ -13,7 +13,7 @@
         <h2 class="subtitle">[[=course.description]]<br>{{ rating_string }}</h2>
 
         <div v-if="!add_mode">
-            <button class="button" v-if="logged_in" @click="set_add_mode(true)">
+            <button class="button is-success" v-if="logged_in" @click="set_add_mode(true)">
                 <span>Rate this course</span>
             </button>
             <button class="button" v-else disabled>

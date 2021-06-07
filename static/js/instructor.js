@@ -26,10 +26,69 @@ let init = (app) => {
         author_email: author_email,
         logged_in: logged_in,
         rating_string: rating_string,
+        mostLikedExists: false,
     };
+
+
+
+    app.getMostLikedReview = function (reviews) {
+
+            for(let i = 0; i < reviews.length; i++) {
+                if(reviews[i].mostLiked) {
+                    return [reviews[i]];
+                }
+            }
+
+    }
+
+    app.getOtherReviews = function (reviews) {
+            console.log(reviews)
+            let otherReviews = [];
+
+            for(let i = 0; i < reviews.length; i++) {
+                if(!reviews[i].mostLiked) {
+                    otherReviews.push(reviews[i]);
+                }
+            }
+            return otherReviews;
+
+    }
 
     app.enumerate = (a) => {
         // This adds an _idx field to each element of the array.
+        if(app.vue.reviews.length > 0) {
+            let maxIndex = 0;
+            let maxVal = app.vue.reviews[0].likers;
+
+            for(let i = 1; i < app.vue.reviews.length; i++) {
+                if(app.vue.reviews[i].likers > maxVal) {
+                    maxVal = app.vue.reviews[i].likers;
+                    maxIndex = i;
+                }
+            }
+
+            if(maxVal == 0) {
+                mostLikedExists = false;
+            }
+            else {
+                mostLikedExists = true;
+            }
+
+            for(let i = 0; i < app.vue.reviews.length; i++) {
+                if(i == maxIndex && mostLikedExists) {
+                    let lastIndex = app.vue.reviews.length-1;
+                    app.vue.reviews[i].mostLiked = true;
+                    let tmp = app.vue.reviews[i];
+                    app.vue.reviews[i] = app.vue.reviews[lastIndex];
+                    app.vue.reviews[lastIndex] = tmp;
+                }
+                else {
+                    app.vue.reviews[i].mostLiked = false;
+                }
+            }
+        }
+
+
         let k = 0;
         a.map((e) => {e._idx = k++;});
         return a;
@@ -196,6 +255,7 @@ let init = (app) => {
                         app.vue.reviews[i].liked = 1;
                         app.vue.reviews[i]._like_id = response.data.id;
                         app.vue.reviews[i].likers++;
+                        app.enumerate(app.vue.reviews);
                         break;
                     }
                 }
@@ -212,6 +272,7 @@ let init = (app) => {
                         app.vue.reviews[i].liked = 0;
                         app.vue.reviews[i]._like_id = -1;
                         app.vue.reviews[i].likers--;
+                        app.enumerate(app.vue.reviews);
                         break;
                     }
                 }
@@ -231,6 +292,7 @@ let init = (app) => {
                         app.vue.reviews[i].liked = 1;
                         app.vue.reviews[i].dislikers--;
                         app.vue.reviews[i].likers++;
+                        app.enumerate(app.vue.reviews);
                         break;
                     }
                 }
@@ -255,6 +317,7 @@ let init = (app) => {
                         app.vue.reviews[i].liked = 2;
                         app.vue.reviews[i]._like_id = response.data.id;
                         app.vue.reviews[i].dislikers++;
+                        app.enumerate(app.vue.reviews);
                         break;
                     }
                 }
@@ -274,6 +337,7 @@ let init = (app) => {
                         app.vue.reviews[i].liked = 2;
                         app.vue.reviews[i].likers--;
                         app.vue.reviews[i].dislikers++;
+                        app.enumerate(app.vue.reviews);
                         break;
                     }
                 }
@@ -290,6 +354,7 @@ let init = (app) => {
                         app.vue.reviews[i].liked = 0;
                         app.vue.reviews[i]._like_id = -1;
                         app.vue.reviews[i].dislikers--;
+                        app.enumerate(app.vue.reviews);
                         break;
                     }
                 }
@@ -332,6 +397,8 @@ let init = (app) => {
         edit_set_star: app.edit_set_star,
         to_profile: app.to_profile,
         to_course: app.to_course,
+        getMostLikedReview: app.getMostLikedReview,
+        getOtherReviews: app.getOtherReviews,
     };
 
     // This creates the Vue instance.

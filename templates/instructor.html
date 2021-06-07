@@ -13,7 +13,7 @@
         <h2 class="subtitle">An instructor in the <b>[[=instr.department]]</b> department at <b>[[=school]]</b><br>{{ rating_string }}</h2>
 
         <div v-if="!add_mode">
-            <button class="button" v-if="logged_in" @click="set_add_mode(true)">
+            <button class="button is-success" v-if="logged_in" @click="set_add_mode(true)">
                 <span>Rate this instructor</span>
             </button>
             <button class="button" v-else disabled>
@@ -62,103 +62,108 @@
         </div>
     </div>
 
+
+
     <div class="section">
-        <h1 class="title">Reviews</h1>
 
-        <hr>
+        <div class="block">
+            <h1 class="title">Reviews</h1>
 
-        <div class="box" v-for="r in reviews.slice().reverse()">
-            <div class="block">
-                <span><b>Course: </b> <a @click="to_course(r._idx)">{{ r.course_name }}</a></span><br>
-                <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span><br>
-                <span><b>User: </b> <a @click="to_profile(r._idx)">{{ r.user_name }}</a></span>
+            <hr>
 
-            </div>
+            <div class="box" v-for="r in reviews.slice().reverse()">
+                <div class="block">
+                    <span><b>Course: </b> <a @click="to_course(r._idx)">{{ r.course_name }}</a></span><br>
+                    <span><b>Rating: </b> {{ r.rating.toFixed(1) }}/5.0</span><br>
+                    <span><b>User: </b> <a @click="to_profile(r._idx)">{{ r.user_name }}</a></span>
 
-            <div class="block" v-if="r.is_editing">
-                <div class="form">
-                    <div class="field">
-                        <label class="label">Rating</label>
-                        <div class="control">
-                            <span @mouseout="edit_stars_out">
-                                <span @mouseover="edit_star_over(star_idx)" @click="edit_set_star(star_idx)" v-for="star_idx in [1, 2, 3, 4, 5]">
-                                    <i v-if="star_idx <= edit_stars_displayed" class="fa fa-star fa-2x"></i>
-                                    <i v-else class="fa fa-star-o fa-2x"></i>
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Edit Review:</label>
-                        <div class="control">
-                            <textarea class="textarea" type="text" v-model="edit_text"></textarea>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <button class="button is-success" @click="save_edit(r._idx, r.id)">
-                                Save
-                            </button>
-                            <button class="button is-danger" @click="cancel_edit(r._idx)">
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
                 </div>
 
-            </div>
-            <div class="block" v-else>
-                {{ r.body }}
-            </div>
+                <div class="block" v-if="r.is_editing">
+                    <div class="form">
+                        <div class="field">
+                            <label class="label">Rating</label>
+                            <div class="control">
+                                <span @mouseout="edit_stars_out">
+                                    <span @mouseover="edit_star_over(star_idx)" @click="edit_set_star(star_idx)" v-for="star_idx in [1, 2, 3, 4, 5]">
+                                        <i v-if="star_idx <= edit_stars_displayed" class="fa fa-star fa-2x"></i>
+                                        <i v-else class="fa fa-star-o fa-2x"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Edit Review:</label>
+                            <div class="control">
+                                <textarea class="textarea" type="text" v-model="edit_text"></textarea>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <button class="button is-success" @click="save_edit(r._idx, r.id)">
+                                    Save
+                                </button>
+                                <button class="button is-danger" @click="cancel_edit(r._idx)">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="block">
-                <button class="button" v-if="logged_in" @click="like_review(r._idx)">
-                    <span class="icon-text">
-                        <span class="icon">
-                            <i class="fa fa-thumbs-up" v-if="r.liked == 1"></i>
-                            <i class="fa fa-thumbs-o-up" v-else></i>
-                        </span>
-                        <span>{{ r.likers }}</span>
-                    </span>
-                </button>
-                <button class="button" v-else disabled>
-                    <span class="icon-text">
-                        <span class="icon">
-                            <i class="fa fa-thumbs-o-up"></i>
-                        </span>
-                        <span>{{ r.likers }}</span>
-                    </span>
-                </button>
+                </div>
+                <div class="block" v-else>
+                    {{ r.body }}
+                </div>
 
-                <button class="button" v-if="logged_in" @click="dislike_review(r._idx)">
-                    <span class="icon-text">
-                        <span class="icon">
-                            <i class="fa fa-thumbs-down" v-if="r.liked == 2"></i>
-                            <i class="fa fa-thumbs-o-down" v-else></i>
+                <div class="block">
+                    <button class="button" v-if="logged_in" @click="like_review(r._idx)">
+                        <span class="icon-text">
+                            <span class="icon">
+                                <i class="fa fa-thumbs-up" v-if="r.liked == 1"></i>
+                                <i class="fa fa-thumbs-o-up" v-else></i>
+                            </span>
+                            <span>{{ r.likers }}</span>
                         </span>
-                        <span>{{ r.dislikers }}</span>
-                    </span>
-                </button>
-                <button class="button" v-else disabled>
-                    <span class="icon-text">
-                        <span class="icon">
-                            <i class="fa fa-thumbs-o-down"></i>
+                    </button>
+                    <button class="button" v-else disabled>
+                        <span class="icon-text">
+                            <span class="icon">
+                                <i class="fa fa-thumbs-o-up"></i>
+                            </span>
+                            <span>{{ r.likers }}</span>
                         </span>
-                        <span>{{ r.dislikers }}</span>
-                    </span>
-                </button>
+                    </button>
 
-                <button class="button is-warning" v-if="r.user == author_email" @click="start_edit(r._idx)">
-                    <span class="icon">
-                        <i class="fa fa-pencil"></i>
-                    </span>
-                </button>
+                    <button class="button" v-if="logged_in" @click="dislike_review(r._idx)">
+                        <span class="icon-text">
+                            <span class="icon">
+                                <i class="fa fa-thumbs-down" v-if="r.liked == 2"></i>
+                                <i class="fa fa-thumbs-o-down" v-else></i>
+                            </span>
+                            <span>{{ r.dislikers }}</span>
+                        </span>
+                    </button>
+                    <button class="button" v-else disabled>
+                        <span class="icon-text">
+                            <span class="icon">
+                                <i class="fa fa-thumbs-o-down"></i>
+                            </span>
+                            <span>{{ r.dislikers }}</span>
+                        </span>
+                    </button>
 
-                <button class="button is-danger" v-if="r.user == author_email" @click="delete_review(r._idx)">
-                    <span class="icon">
-                        <i class="fa fa-trash"></i>
-                    </span>
-                </button>
+                    <button class="button is-warning" v-if="r.user == author_email" @click="start_edit(r._idx)">
+                        <span class="icon">
+                            <i class="fa fa-pencil"></i>
+                        </span>
+                    </button>
+
+                    <button class="button is-danger" v-if="r.user == author_email" @click="delete_review(r._idx)">
+                        <span class="icon">
+                            <i class="fa fa-trash"></i>
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

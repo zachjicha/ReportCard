@@ -377,7 +377,6 @@ let init = (app) => {
                     }
                 }
             }
-
             app.vue.reviews = reviews;
         });
     };
