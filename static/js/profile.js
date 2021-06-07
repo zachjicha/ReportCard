@@ -17,9 +17,6 @@ let init = (app) => {
         author_email: author_email,
         logged_in: logged_in,
         user_id: user_id,
-        //has_pfp: has_pfp,
-        //uploading: false,
-        //deleting: false,
     };
 
     app.enumerate = (a) => {
@@ -29,115 +26,7 @@ let init = (app) => {
         return a;
     };
 
-    /*
-    app.upload_pfp = function (event) {
-
-        let input = event.target;
-        let file = input.files[0];
-        if (file) {
-
-            // from https://roufid.com/javascript-check-file-image/
-            const acceptedImageTypes = ['image/jpeg', 'image/png'];
-
-            // If file is not image, fail
-            if(!acceptedImageTypes.includes(file.type)) {
-                alert("Only jpeg and png files are accepted");
-                return;
-            }
-
-            app.vue.uploading = true;
-            let file_type = file.type;
-            let file_name = file.name;
-            // Requests the upload URL.
-            axios.post(access_pfp_url, {
-                action: "PUT",
-                file_name: file_name,
-                file_type: file_type,
-            }).then ((r) => {
-                let upload_url = r.data.signed_url;
-                console.log(upload_url);
-                let file_path = r.data.file_path;
-                // Uploads the file, using the low-level interface.
-                let req = new XMLHttpRequest();
-                // We listen to the load event = the file is uploaded, and we call upload_complete.
-                // That function will notify the server `of the location of the image.
-                req.addEventListener("load", function () {
-                    app.upload_complete(file_name, file_path);
-                });
-
-                // Clean up on error
-                req.addEventListener("error", function () {
-                    alert("Image upload failed!");
-                    app.vue.uploading = false;
-                    return;
-                });
-
-                req.open("PUT", upload_url, true);
-                req.send(file);
-            });
-        }
-    }
-
-    app.upload_complete = function (file_name, file_path) {
-        // We need to let the server know that the upload was complete;
-        axios.post(notify_upload_pfp_url, {
-            file_name: file_name,
-            file_path: file_path,
-        }).then( function (r) {
-            app.vue.uploading = false;
-            // Reload so changes take effect
-            //window.location.reload();
-        });
-    }
-
-    app.delete_pfp = function () {
-        if (!app.vue.delete_confirmation) {
-            // Ask for confirmation before deleting it.
-            app.vue.delete_confirmation = true;
-        } else {
-            // It's confirmed.
-            app.vue.delete_confirmation = false;
-            app.vue.deleting = true;
-            // Obtains the delete URL.
-            let file_path = app.vue.file_path;
-            axios.post(access_pfp_url, {
-                action: "DELETE",
-                file_path: file_path,
-            }).then(function (r) {
-                let delete_url = r.data.signed_url;
-                if (delete_url) {
-                    // Performs the deletion request.
-                    let req = new XMLHttpRequest();
-                    req.addEventListener("load", function () {
-                        app.deletion_complete(file_path);
-                    });
-
-                    // Clean up on error
-                    req.addEventListener("error", function () {
-                        alert("Image delete failed!");
-                        app.vue.deleting = false;
-                        return;
-                    });
-
-                    req.open("DELETE", delete_url);
-                    req.send();
-                }
-            });
-        }
-    }
-
-    app.deletion_complete = function (file_path) {
-        // We need to notify the server that the file has been deleted on GCS.
-        axios.post(notify_delete_pfp_url, {
-            file_path: file_path,
-        }).then (function (r) {
-            // Poof, no more file.
-            app.vue.deleting =  false;
-            // Reload so changes take effect
-            window.location.reload();
-        })
-    }*/
-
+    // In place edit stars function
     app.edit_stars_out = function () {
         app.vue.edit_stars_displayed = app.vue.edit_rating;
     }
@@ -150,6 +39,7 @@ let init = (app) => {
         app.vue.edit_stars_displayed = star_idx;
     }
 
+    // Start in place edit
     app.start_edit = function (rev_idx) {
         if(!app.vue.is_editing) {
             app.vue.reviews[rev_idx].is_editing = true;
@@ -160,6 +50,7 @@ let init = (app) => {
         }
     }
 
+    // Save in place edit
     app.save_edit = function (rev_idx, rev_id) {
         axios.post(
             edit_review_url,
@@ -178,6 +69,7 @@ let init = (app) => {
         });
     }
 
+    // Cancel in place edit
     app.cancel_edit = function (rev_idx) {
         app.vue.reviews[rev_idx].is_editing = false;
         app.vue.is_editing = false;
@@ -185,7 +77,9 @@ let init = (app) => {
         app.vue.edit_stars_displayed = 0;
     }
 
+    // Delete review from db and page
     app.delete_review = function (rev_idx) {
+        // Send request to delete, once confirmed remove from page
         let id = app.vue.reviews[rev_idx].id;
         axios.post(
             delete_review_url,
@@ -202,6 +96,7 @@ let init = (app) => {
         });
     }
 
+    // Like a review
     app.like_review = function (review_idx) {
         let review = app.vue.reviews[review_idx];
 
@@ -261,6 +156,7 @@ let init = (app) => {
         }
     }
 
+    // Dislike a review
     app.dislike_review = function (review_idx) {
         let review = app.vue.reviews[review_idx];
 
@@ -320,11 +216,13 @@ let init = (app) => {
         }
     }
 
+    // Navigate to reviewed instructor page
     app.to_instr = function (rev_idx) {
         let dest = '../instructor/' + app.vue.reviews[rev_idx].instructor.toString();
         window.location.href = dest;
     }
 
+    // Navigate to reviewd course page
     app.to_course = function (rev_idx) {
         let dest = '../course/' + app.vue.reviews[rev_idx].course.toString();
         window.location.href = dest;
@@ -332,8 +230,6 @@ let init = (app) => {
 
     // This contains all the methods.
     app.methods = {
-        //upload_pfp: app.upload_pfp,
-        //delete_pfp: app.delete_pfp,
         edit_stars_out: app.edit_stars_out,
         edit_set_star: app.edit_set_star,
         edit_star_over: app.edit_star_over,
