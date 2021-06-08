@@ -7,3 +7,5 @@ Zachary Jicha: zjicha
 Michael Zhan: mizhan  
 
 Video Link: []()
+
+Implementation Doc can be found in the root directory as implementation_doc.pdf
