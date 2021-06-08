@@ -6,6 +6,6 @@ Group:
 Zachary Jicha: zjicha  
 Michael Zhan: mizhan  
 
-Video Link: []()
+[Video Demo Link](https://www.youtube.com/watch?v=Vp7sEFKj5W0)
 
 Implementation Doc can be found in the root directory as implementation_doc.pdf
